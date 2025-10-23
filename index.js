@@ -28,7 +28,7 @@ else { log.info("LOG: Fungsi 'runtime' sudah ada."); }
 try { require("./function.js"); log.info("LOG: function.js dimuat (jika ada)."); } catch (e) { if (e.code === 'MODULE_NOT_FOUND') { log.warn("PERINGATAN: function.js tidak ditemukan."); } else { log.error("FATAL ERROR load function.js:", e.message); process.exit(1); } }
 
 const app = express();
-const PORT = process.env.SERVER_PORT || process.env.PORT || 8000;
+const PORT = process.env.SERVER_PORT || process.env.PORT || 3000;
 log.info(`LOG: Port: ${PORT}`); log.info(`LOG: Anti-Flood: ${FLOOD_DETECTION_ENABLED ? `ON (${FLOOD_LIMIT_PER_WINDOW} req / ${FLOOD_WINDOW_SECONDS}s)` : 'OFF'}`);
 app.enable("trust proxy"); app.set("json spaces", 2); app.use(express.json()); app.use(express.urlencoded({ extended: false })); app.use(cors()); log.info("LOG: Middleware dasar dimuat.");
 
