@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        :root {
+            --primary: #6366f1; --primary-dark: #4f46e5; --primary-light: #818cf8;
+            --gray-100: #f3f4f6; --gray-300: #d1d5db; --gray-500: #6b7280;
+            --gray-600: #4b5563; --gray-700: #374151; --gray-900: #111827;
+            --red-100: #fee2e2; --red-700: #b91c1c; --red-border: #fecaca;
+            --white: #ffffff;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+            --ring-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: var(--gray-100);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 1rem;
+        }
+        .login-card {
+            background: var(--white);
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 400px;
+            overflow: hidden;
+        }
+        .card-header {
+            padding: 1.5rem 1.5rem 1rem 1.5rem;
+            text-align: center;
+            border-bottom: 1px solid var(--gray-100);
+        }
+        .card-header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        .card-body {
+            padding: 1.5rem;
+        }
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+        label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.375rem;
+            color: var(--gray-600);
+            font-size: 0.875rem;
+        }
+        input {
+            display: block;
+            width: 100%;
+            padding: 0.625rem 0.75rem;
+            font-size: 0.95rem;
+            border-radius: 0.375rem;
+            border: 1px solid var(--gray-300);
+            box-sizing: border-box;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: var(--ring-shadow);
+        }
+        button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            background: var(--primary);
+            color: var(--white);
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: background-color 0.2s, transform 0.1s;
+            margin-top: 0.5rem;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            border-radius: 0.375rem;
+        }
+        button i {
+            margin-right: 0.5rem;
+        }
+        button:hover:not(:disabled) {
+            background: var(--primary-dark);
+        }
+        button:disabled {
+            background: var(--primary-light);
+            cursor: not-allowed;
+        }
+        .response {
+            margin-top: 1rem;
+            padding: 0.75rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            display: none; /* Mulai tersembunyi */
+            text-align: center;
+            font-size: 0.875rem;
+            background: var(--red-100);
+            color: var(--red-700);
+            border: 1px solid var(--red-border);
+        }
+        /* Style tambahan jika sukses (meski tidak dipakai di sini) */
+        .response.success {
+             background: var(--green-100);
+             color: var(--green-700);
+             border: 1px solid var(--green-border);
+        }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <div class="card-header">
+            <h1>Admin Login</h1>
+        </div>
+        <div class="card-body">
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit" id="loginButton">
+                    <i class="fa fa-sign-in-alt"></i> Login
+                </button>
+            </form>
+            <div id="response" class="response"></div> </div>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const passwordInput = document.getElementById('password');
+            const password = passwordInput.value;
+            const button = document.getElementById('loginButton');
+            const responseEl = document.getElementById('response');
+
+            // Reset notifikasi
+            responseEl.style.display = 'none';
+            responseEl.textContent = '';
+            responseEl.className = 'response'; // Reset ke class dasar (merah)
+
+            // Validasi input kosong (opsional tapi bagus)
+            if (!password) {
+                responseEl.textContent = 'Password tidak boleh kosong.';
+                responseEl.style.display = 'block';
+                passwordInput.focus(); // Fokus ke input password
+                return; // Stop eksekusi
+            }
+
+            button.disabled = true;
+            button.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Logging in...';
+
+            try {
+                const res = await fetch('/api/admin/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: password })
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    // Ambil pesan error dari server jika ada
+                    throw new Error(data.error || `Login failed (${res.status})`);
+                }
+
+                // Jika sukses, simpan ADMIN_API_KEY (token) ke session
+                sessionStorage.setItem('adminApiKey', data.token);
+                
+                // Arahkan ke halaman admin-panel yang baru
+                window.location.href = '/admin-panel';
+
+            } catch (err) {
+                // Tampilkan pesan error di elemen notifikasi
+                responseEl.textContent = `Error: ${err.message}`;
+                responseEl.style.display = 'block';
+                button.disabled = false;
+                button.innerHTML = '<i class="fa fa-sign-in-alt"></i> Login';
+            }
+        });
+    </script>
+</body>
+</html>

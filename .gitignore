@@ -1,0 +1,23 @@
+# Folder dependensi Node.js
+node_modules
+
+# File Environment (SANGAT RAHASIA)
+.env
+
+# File Data JSON yang Dihasilkan (BERISI DATA PENGGUNA/KONFIG)
+blacklist.json
+rate_limits.json
+unique_ips.json
+user_data.json
+api_keys.json             # <-- Tambahan
+apikey_requirements.json  # <-- Tambahan
+
+# File log (jika ada)
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# File sistem operasi
+.DS_Store
+Thumbs.db

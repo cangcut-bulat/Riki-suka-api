@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Control Panel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        :root {
+            --primary: #6366f1; --primary-dark: #4f46e5; --primary-light: #818cf8;
+            --gray-100: #f3f4f6; --gray-200: #e5e7eb; --gray-300: #d1d5db; --gray-500: #6b7280;
+            --gray-600: #4b5563; --gray-700: #374151; --gray-800: #1f2937; --gray-900: #111827;
+            --red-100: #fee2e2; --red-700: #b91c1c; --red-border: #fecaca;
+            --green-100: #dcfce7; --green-700: #047857; --green-border: #a7f3d0;
+            --yellow-100: #fef9c3; --yellow-700: #a16207; --yellow-border: #fde68a;
+            --white: #ffffff;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+            --ring-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+            --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+        }
+        *, *::before, *::after { box-sizing: border-box; }
+        body {
+            margin: 0; font-family: var(--font-sans); background-color: var(--gray-100);
+            color: var(--gray-800); line-height: 1.5;
+            -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* --- Notifikasi iPhone Style --- */
+        .admin-notification {
+            position: fixed; top: 0; left: 20px; right: 20px; margin-top: 15px; padding: 1rem 1.5rem;
+            border-radius: 0.75rem; font-weight: 600; color: var(--white);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transform: translateY(-200%); transition: transform 0.4s ease-out; z-index: 1000;
+            display: flex; align-items: center; gap: 0.75rem; border: 1px solid rgba(255, 255, 255, 0.1);
+            max-width: 600px; margin-left: auto; margin-right: auto;
+        }
+        .admin-notification.show { transform: translateY(0); }
+        .admin-notification.success { background-color: #28a745; }
+        .admin-notification.error { background-color: #dc3545; }
+        .admin-notification i { font-size: 1.25rem; }
+        /* --- Akhir Notifikasi --- */
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 1.5rem 1rem; padding-top: 70px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--gray-300); }
+        .header h1 { font-size: 1.875rem; font-weight: 700; color: var(--gray-900); margin: 0; }
+        .btn-logout { background-color: var(--red-100); color: var(--red-700); border: 1px solid var(--red-border); padding: 0.5rem 1rem; border-radius: 0.375rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; }
+        .btn-logout:hover { background-color: #fecaca; }
+
+        .nav-tabs { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem; background-color: var(--white); border-radius: 0.5rem; padding: 0.5rem; box-shadow: var(--shadow); }
+        .nav-tab { padding: 0.75rem 1.25rem; font-weight: 600; color: var(--gray-600); border-radius: 0.375rem; cursor: pointer; transition: all 0.2s ease; border: 1px solid transparent; display: inline-flex; align-items: center; gap: 0.5rem; }
+        .nav-tab:hover { background-color: var(--gray-100); color: var(--gray-900); }
+        .nav-tab.active { background-color: var(--primary-light); color: var(--primary-dark); border-color: var(--primary-light); box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+        .nav-tab i { color: var(--gray-500); }
+        .nav-tab.active i { color: inherit; }
+
+        .section { display: none; }
+        .section.active { display: block; }
+        .grid { display: grid; grid-template-columns: repeat(1, minmax(0, 1fr)); gap: 1.5rem; }
+        @media (min-width: 1024px) {
+            .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+            .grid-span-2 { grid-column: span 2 / span 2; }
+            .grid-span-3 { grid-column: span 3 / span 3; }
+        }
+
+        .card { background-color: var(--white); border-radius: 0.5rem; box-shadow: var(--shadow); overflow: hidden; }
+        .card-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--gray-200); }
+        .card-header h2 { margin: 0; font-size: 1.25rem; font-weight: 600; color: var(--gray-900); }
+        .card-body { padding: 1.5rem; }
+        .form-group { margin-bottom: 1.25rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--gray-700); }
+        .form-control { width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--gray-300); border-radius: 0.375rem; font-size: 1rem; line-height: 1.5; color: var(--gray-900); background-color: var(--white); transition: border-color 0.2s ease, box-shadow 0.2s ease; }
+        .form-control:focus { outline: none; border-color: var(--primary); box-shadow: var(--ring-shadow); }
+        .form-control::placeholder { color: var(--gray-500); }
+        .form-control[type="number"] { max-width: 150px; }
+
+        .btn { padding: 0.75rem 1.25rem; border-radius: 0.375rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; border: 1px solid transparent; font-size: 1rem; }
+        .btn-primary { background-color: var(--primary); color: var(--white); border-color: var(--primary); }
+        .btn-primary:hover { background-color: var(--primary-dark); border-color: var(--primary-dark); }
+        .btn-danger { background-color: var(--red-100); color: var(--red-700); border-color: var(--red-border); }
+        .btn-danger:hover { background-color: #fecaca; }
+        .btn-secondary { background-color: var(--gray-200); color: var(--gray-800); border-color: var(--gray-300); }
+        .btn-secondary:hover { background-color: var(--gray-300); }
+        .btn-sm { padding: 0.375rem 0.75rem; font-size: 0.875rem; }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .btn i { line-height: 1; }
+
+        .status-badge { display: inline-block; padding: 0.25em 0.6em; font-size: 0.875rem; font-weight: 600; border-radius: 0.375rem; line-height: 1; }
+        .status-badge.on, .status-badge.req-key-yes { background-color: var(--green-100); color: var(--green-700); }
+        .status-badge.off, .status-badge.req-key-no { background-color: var(--red-100); color: var(--red-700); }
+        .status-badge.key-valid { background-color: var(--green-100); color: var(--green-700); }
+        .status-badge.key-expired { background-color: var(--red-100); color: var(--red-700); }
+        .status-badge.key-nolimit { background-color: var(--primary-light); color: var(--primary-dark); }
+        .status-badge.initial-yes { background-color: var(--yellow-100); color: var(--yellow-700); border: 1px solid var(--yellow-border); }
+        .status-badge.initial-no { background-color: var(--gray-200); color: var(--gray-600); border: 1px solid var(--gray-300); }
+
+        .list-group { max-height: 400px; overflow-y: auto; border: 1px solid var(--gray-200); border-radius: 0.375rem; }
+        .list-group-item { padding: 0.75rem 1.25rem; border-bottom: 1px solid var(--gray-200); display: flex; justify-content: space-between; align-items: center; }
+        .list-group-item:last-child { border-bottom: none; }
+        .list-group-item.placeholder { padding: 2rem; text-align: center; color: var(--gray-500); }
+
+        .table-wrapper { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid var(--gray-200); white-space: nowrap; vertical-align: middle; }
+        th { background-color: var(--gray-100); font-weight: 600; color: var(--gray-600); text-transform: uppercase; font-size: 0.75rem; }
+        td { color: var(--gray-700); font-size: 0.9rem; }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background-color: #f9fafb; }
+        .table-placeholder { text-align: center; padding: 2rem; color: var(--gray-500); }
+        .expired-row { background-color: #fff1f2; }
+        .expired-row td { color: var(--gray-500); text-decoration: line-through; }
+
+        .key-cell { font-family: monospace; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .key-cell-container { display: flex; align-items: center; gap: 0.5rem; }
+
+        /* --- Switch Toggle Style --- */
+        .switch { position: relative; display: inline-block; width: 50px; height: 28px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--red-border); /* Warna OFF Merah */ transition: .4s; border-radius: 28px; }
+        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--primary); /* Warna ON Biru */ }
+        input:checked + .slider:before { transform: translateX(22px); }
+        /* --- Akhir Switch Style --- */
+    </style>
+</head>
+<body>
+
+    <div id="adminNotification" class="admin-notification">
+        <i id="adminNotificationIcon" class="fa fa-check-circle"></i>
+        <span id="adminNotificationText"></span>
+    </div>
+
+    <div class="container">
+        <header class="header">
+            <h1>Admin Control Panel</h1>
+            <a href="#" id="logoutButton" class="btn-logout">
+                <i class="fa fa-sign-out-alt"></i> Logout
+            </a>
+        </header>
+
+        <nav class="nav-tabs">
+            <a class="nav-tab active" data-section="dashboardSection" onclick="showSection('dashboardSection')"> <i class="fa fa-tachometer-alt"></i> Dashboard </a>
+            <a class="nav-tab" data-section="ipUsersSection" onclick="showSection('ipUsersSection')"> <i class="fa fa-users"></i> Pengguna IP </a>
+            <a class="nav-tab" data-section="blacklistSection" onclick="showSection('blacklistSection')"> <i class="fa fa-shield-alt"></i> Blacklist </a>
+            <a class="nav-tab" data-section="apiKeySettingsSection" onclick="showSection('apiKeySettingsSection')"> <i class="fa fa-key"></i> Pengaturan API Key </a>
+            <a class="nav-tab" data-section="endpointSection" onclick="showSection('endpointSection')"> <i class="fa fa-tag"></i> Label Endpoint </a>
+            <a class="nav-tab" data-section="customKeysSection" onclick="showSection('customKeysSection')"> <i class="fa fa-user-secret"></i> Kunci Kustom </a>
+        </nav>
+
+        <main>
+            <section id="dashboardSection" class="section active">
+                <div class="grid grid-cols-3">
+                    <div class="card"> <div class="card-header"><h2>Status Limit IP Global</h2></div> <div class="card-body"> <form id="limitToggleForm"> <p>Status saat ini: <span id="limitStatusBadge" class="status-badge">Loading...</span></p> <p>Global Limit: <strong id="globalLimitValue">Loading...</strong> reqs/hari</p> <button type="submit" class="btn btn-primary" id="limitToggleButton"> <i class="fa fa-power-off"></i> <span id="limitToggleText">...</span> </button> </form> </div> </div>
+                    <div class="card"> <div class="card-header"><h2>Atur Limit IP Global</h2></div> <div class="card-body"> <form id="globalLimitForm"> <div class="form-group"> <label for="newGlobalLimit">Limit Harian Baru</label> <input type="number" id="newGlobalLimit" class="form-control" placeholder="Contoh: 100" min="0" required> </div> <button type="submit" class="btn btn-primary" id="globalLimitButton"> <i class="fa fa-save"></i> Simpan </button> </form> </div> </div>
+                    <div class="card"> <div class="card-header"><h2>Atur Limit IP Spesifik</h2></div> <div class="card-body"> <form id="ipLimitForm"> <div class="form-group"> <label for="specificIp">IP Address</label> <input type="text" id="specificIp" class="form-control" placeholder="Contoh: 127.0.0.1" required> </div> <div class="form-group"> <label for="newIpLimit">Limit Baru (0 = unlimited)</label> <input type="number" id="newIpLimit" class="form-control" placeholder="Contoh: 50" min="0" required> </div> <button type="submit" class="btn btn-primary" id="ipLimitButton"> <i class="fa fa-save"></i> Simpan </button> </form> </div> </div>
+                </div>
+            </section>
+
+            <section id="ipUsersSection" class="section">
+                 <div class="grid"> <div class="card"> <div class="card-header"> <div style="display: flex; justify-content: space-between; align-items: center;"> <h2>Daftar Pengguna IP (Limit Harian)</h2> <button class="btn btn-secondary btn-sm" id="refreshIpLimitListButton"> <i class="fa fa-sync"></i> Refresh </button> </div> </div> <div class="card-body" style="padding: 0;"> <div class="table-wrapper"> <table> <thead> <tr> <th>IP Address</th> <th>Penggunaan</th> <th>Tipe Limit</th> <th>Reset Dalam</th> </tr> </thead> <tbody id="ipLimitTableBody"> <tr><td colspan="4" class="table-placeholder">Loading data...</td></tr> </tbody> </table> </div> </div> </div> </div>
+            </section>
+
+            <section id="blacklistSection" class="section">
+                <div class="grid grid-cols-2"> <div class="card"> <div class="card-header"><h2>Manajemen Blacklist IP</h2></div> <div class="card-body"> <form id="blacklistAddForm"> <div class="form-group"> <label for="ipBlacklistAdd">Tambah IP ke Blacklist</label> <input type="text" id="ipBlacklistAdd" class="form-control" placeholder="Contoh: 1.2.3.4" required> </div> <button type="submit" class="btn btn-danger" id="blacklistAddButton"> <i class="fa fa-plus-circle"></i> Tambah </button> </form> <hr style="border: 0; border-top: 1px solid var(--gray-200); margin: 1.5rem 0;"> <form id="blacklistRemoveForm"> <div class="form-group"> <label for="ipBlacklistRemove">Hapus IP dari Blacklist</label> <input type="text" id="ipBlacklistRemove" class="form-control" placeholder="Contoh: 1.2.3.4" required> </div> <button type="submit" class="btn btn-secondary" id="blacklistRemoveButton"> <i class="fa fa-trash-alt"></i> Hapus </button> </form> </div> </div> <div class="card"> <div class="card-header"><h2>Daftar IP Ter-Blacklist</h2></div> <div class="card-body"> <button class="btn btn-secondary" id="refreshBlacklistButton" style="margin-bottom: 1rem;"> <i class="fa fa-sync"></i> Refresh </button> <div class="list-group" id="blacklistList"> <div class="list-group-item placeholder">Loading...</div> </div> </div> </div> </div>
+            </section>
+
+            <section id="apiKeySettingsSection" class="section">
+                <div class="grid">
+                    <div class="card">
+                        <div class="card-header">
+                             <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <h2>Pengaturan Wajib/Publik API Key per Endpoint</h2>
+                                <button class="btn btn-secondary btn-sm" id="refreshApiKeyReqButton">
+                                    <i class="fa fa-sync"></i> Refresh
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body" style="padding: 0;">
+                            <div class="table-wrapper">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Endpoint Path</th>
+                                            <th>Status Awal (settings.json)</th>
+                                            <th>Status Saat Ini</th>
+                                            <th>Wajibkan API Key? (ON=Wajib)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="apiKeyReqTableBody">
+                                        <tr><td colspan="4" class="table-placeholder">Loading data...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                 </div>
+            </section>
+            <section id="endpointSection" class="section">
+                <div class="grid grid-cols-1" style="max-width: 600px; margin: 0 auto;"> <div class="card"> <div class="card-header"><h2>Atur Label Endpoint (NEW/FIX)</h2></div> <div class="card-body"> <form id="endpointLabelForm"> <div class="form-group"> <label for="endpointPath">Endpoint Path</label> <select id="endpointPath" class="form-control" required> <option value="">Loading endpoints...</option> </select> </div> <div class="form-group"> <label for="endpointLabel">Label (NEW / FIX / Kosongkan)</label> <input type="text" id="endpointLabel" class="form-control" placeholder="NEW (case sensitive)"> </div> <button type="submit" class="btn btn-primary" id="endpointLabelButton"> <i class="fa fa-tag"></i> Atur Label (24 jam) </button> </form> </div> </div> </div>
+            </section>
+
+            <section id="customKeysSection" class="section">
+                <div class="grid"> <div class="card"> <div class="card-header"><h2>Buat Kunci API Kustom Baru</h2></div> <div class="card-body"> <form id="customKeyAddForm"> <div class="grid grid-cols-2"> <div class="form-group"> <label for="customKeyName">Nama Pengguna</label> <input type="text" id="customKeyName" class="form-control" placeholder="Contoh: Riki shop real" required value="Riki shop"> </div> <div class="form-group"> <label for="customKeyString">API Key</label> <input type="text" id="customKeyString" class="form-control" placeholder="Contoh: hai_atau_riki_ganteng" required> <small style="color: var(--gray-500);">Kunci yang akan digunakan pengguna.</small> </div> <div class="form-group"> <label for="customKeyLimit">Limit Request</label> <input type="number" id="customKeyLimit" class="form-control" placeholder="6000" min="0" required value="6000"> <small style="color: var(--gray-500);">0 = Unlimited</small> </div> <div class="form-group"> <label for="customKeyDays">Masa Aktif (Hari)</label> <input type="number" id="customKeyDays" class="form-control" placeholder="30" min="1" required value="30"> </div> </div> <button type="submit" class="btn btn-primary" id="customKeyAddButton"> <i class="fa fa-plus-circle"></i> Buat Kunci Baru </button> <div id="responseCustomKeyAdd" style="margin-top: 1rem; display: none;"></div> </form> </div> </div> <div class="card"> <div class="card-header"> <div style="display: flex; justify-content: space-between; align-items: center;"> <h2>Daftar Kunci API Kustom</h2> <button class="btn btn-secondary btn-sm" id="refreshCustomKeysButton"> <i class="fa fa-sync"></i> Refresh </button> </div> </div> <div class="card-body" style="padding: 0;"> <div class="table-wrapper"> <table> <thead> <tr> <th>Nama Pengguna</th> <th>API Key</th> <th>Penggunaan (Count/Limit)</th> <th>Masa Aktif</th> <th>Status</th> <th>Aksi</th> </tr> </thead> <tbody id="customKeysTableBody"> <tr><td colspan="6" class="table-placeholder">Loading data...</td></tr> </tbody> </table> </div> </div> </div> </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        // Ambil token dari sessionStorage
+        const ADMIN_API_KEY = sessionStorage.getItem('adminApiKey');
+        if (!ADMIN_API_KEY) { window.location.href = '/admin'; }
+
+        // --- Notifikasi iPhone Style ---
+        let notificationTimer;
+        function showAdminNotification(message, type = 'success') {
+            const notif = document.getElementById('adminNotification'); const notifText = document.getElementById('adminNotificationText'); const notifIcon = document.getElementById('adminNotificationIcon');
+            if (!notif || !notifText || !notifIcon) return; if (notificationTimer) clearTimeout(notificationTimer);
+            notifText.textContent = message;
+            if (type === 'success') { notif.className = 'admin-notification success'; notifIcon.className = 'fa fa-check-circle'; }
+            else { notif.className = 'admin-notification error'; notifIcon.className = 'fa fa-exclamation-triangle'; }
+            notif.classList.add('show');
+            notificationTimer = setTimeout(() => { notif.classList.remove('show'); }, 3000);
+        }
+
+        // --- Fungsi helper untuk fetch ---
+        async function adminFetch(endpoint, options = {}) {
+            const button = options.button || null; if (button) button.disabled = true;
+            try {
+                let reqOptions = { ...options };
+                if (reqOptions.method && reqOptions.method !== 'GET') { let body = options.body ? JSON.parse(options.body) : {}; body.apikey = ADMIN_API_KEY; reqOptions.body = JSON.stringify(body); reqOptions.headers = { ...options.headers, 'Content-Type': 'application/json' }; }
+                else { const url = new URL(endpoint, window.location.origin); url.searchParams.append('apikey', ADMIN_API_KEY); endpoint = url.pathname + url.search; }
+                const res = await fetch(endpoint, reqOptions); const data = await res.json();
+                if (!res.ok) { throw new Error(data.error || `Error ${res.status}`); }
+                if (data.message) { showAdminNotification(data.message, 'success'); }
+                return data;
+            } catch (err) {
+                console.error(`Fetch error to ${endpoint}:`, err); showAdminNotification(`Error: ${err.message}`, 'error');
+                if (err.message.includes("Admin API Key invalid") || err.message.includes("403")) { sessionStorage.removeItem('adminApiKey'); window.location.href = '/admin'; }
+                return null;
+            } finally { if (button) button.disabled = false; }
+        }
+
+        // --- Fungsi helper untuk copy (dengan fallback HTTP) ---
+        function copyToClipboard(text, btn) {
+            try {
+                if (!btn) return; const original = btn.innerHTML; const msg = "Berhasil disalin!";
+                const feedback = (s) => { btn.innerHTML = s ? `<i class="fa fa-check"></i>` : `<i class="fa fa-times"></i> Gagal`; showAdminNotification(s ? msg : "Gagal menyalin!", s ? 'success' : 'error'); setTimeout(() => { if (btn) btn.innerHTML = original; }, 2000); };
+                if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(text).then(() => feedback(true)).catch(fallback); } else { fallback(); }
+                function fallback() { try { const ta = document.createElement("textarea"); ta.value = text; ta.style.cssText = 'position:fixed;top:-999px;left:-999px;'; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); feedback(true); } catch (e) { console.error('Fallback copy error:', e); feedback(false); } }
+            } catch (e) { console.error("copyToClipboard error:", e); showAdminNotification("Copy error!", "error"); }
+        }
+
+        // Fungsi helper format tanggal
+        function formatExpiry(timestamp) { if (!timestamp) return '<i>N/A</i>'; const date = new Date(timestamp); return date.toLocaleString('id-ID', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+
+        // Fungsi ganti section
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            document.querySelector(`.nav-tab[data-section="${sectionId}"]`).classList.add('active');
+            if (sectionId === 'dashboardSection') loadLimitStatus();
+            if (sectionId === 'ipUsersSection') loadIpLimitList();
+            if (sectionId === 'blacklistSection') loadBlacklist();
+            if (sectionId === 'apiKeySettingsSection') loadApiKeyRequirements(); // <-- Panggil fungsi baru
+            if (sectionId === 'endpointSection') loadEndpointList();
+            if (sectionId === 'customKeysSection') loadCustomKeys();
+        }
+
+        // Fungsi logout
+        document.getElementById('logoutButton').addEventListener('click', (e) => { e.preventDefault(); sessionStorage.removeItem('adminApiKey'); window.location.href = '/admin'; });
+
+        // --- SECTION: DASHBOARD ---
+        async function loadLimitStatus() {
+            const data = await adminFetch('/api/admin/limit/status', { method: 'GET' });
+            if (data) {
+                const badge = document.getElementById('limitStatusBadge'); const btnText = document.getElementById('limitToggleText');
+                if (data.enabled) { badge.textContent = 'ON'; badge.className = 'status-badge on'; btnText.textContent = 'Matikan'; }
+                else { badge.textContent = 'OFF'; badge.className = 'status-badge off'; btnText.textContent = 'Aktifkan'; }
+                document.getElementById('globalLimitValue').textContent = data.globalLimit === 0 ? 'Unlimited' : data.globalLimit;
+                document.getElementById('limitToggleButton').dataset.enabled = data.enabled;
+            }
+        }
+        document.getElementById('limitToggleForm').addEventListener('submit', async (e) => { e.preventDefault(); const button = document.getElementById('limitToggleButton'); const currentState = button.dataset.enabled === 'true'; await adminFetch('/api/admin/limit/toggle', { method: 'POST', body: JSON.stringify({ enable: !currentState }), button: button }); loadLimitStatus(); });
+        document.getElementById('globalLimitForm').addEventListener('submit', async (e) => { e.preventDefault(); const button = document.getElementById('globalLimitButton'); const newLimit = document.getElementById('newGlobalLimit').value; await adminFetch('/api/admin/limit/set-global', { method: 'POST', body: JSON.stringify({ newLimit: newLimit }), button: button }); loadLimitStatus(); });
+        document.getElementById('ipLimitForm').addEventListener('submit', async (e) => { e.preventDefault(); const button = document.getElementById('ipLimitButton'); const ip = document.getElementById('specificIp').value; const newLimit = document.getElementById('newIpLimit').value; await adminFetch('/api/admin/limit/set-ip', { method: 'POST', body: JSON.stringify({ ip: ip, newLimit: newLimit }), button: button }); document.getElementById('ipLimitForm').reset(); });
+
+        // --- SECTION: PENGGUNA IP ---
+        function formatMsToTime(ms) { if (ms <= 0) return "Reset"; let s = Math.floor(ms / 1000); let m = Math.floor(s / 60); s = s % 60; let h = Math.floor(m / 60); m = m % 60; return `${h}j ${m}m ${s}d`; }
+        async function loadIpLimitList() {
+            const tableBody = document.getElementById('ipLimitTableBody'); tableBody.innerHTML = '<tr><td colspan="4" class="table-placeholder">Loading data...</td></tr>';
+            const data = await adminFetch('/api/admin/limit/all-ips', { method: 'GET' });
+            if (data && data.ipData) {
+                if (data.ipData.length === 0) { tableBody.innerHTML = '<tr><td colspan="4" class="table-placeholder">Belum ada data IP.</td></tr>'; }
+                else { tableBody.innerHTML = data.ipData.map(ipInfo => `<tr class="${ipInfo.isExpired ? 'expired-row' : ''}"><td>${ipInfo.ip}</td><td>${ipInfo.usageDisplay}</td><td>${ipInfo.specificLimitDisplay}</td><td>${ipInfo.isExpired ? 'Reset' : formatMsToTime(ipInfo.resetsInMs)}</td></tr>`).join(''); }
+            } else { tableBody.innerHTML = '<tr><td colspan="4" class="table-placeholder">Gagal memuat data.</td></tr>'; }
+        }
+        document.getElementById('refreshIpLimitListButton').addEventListener('click', loadIpLimitList);
+
+        // --- SECTION: BLACKLIST ---
+        async function loadBlacklist() {
+            const listEl = document.getElementById('blacklistList'); listEl.innerHTML = '<div class="list-group-item placeholder">Loading...</div>';
+            const data = await adminFetch('/api/admin/blacklist/list', { method: 'GET' });
+            if (data && data.blacklist) {
+                if (data.blacklist.length === 0) { listEl.innerHTML = '<div class="list-group-item placeholder">Blacklist kosong.</div>'; }
+                else { listEl.innerHTML = data.blacklist.map(ip => `<div class="list-group-item"><code>${ip}</code></div>`).join(''); }
+            } else { listEl.innerHTML = '<div class="list-group-item placeholder">Gagal memuat.</div>'; }
+        }
+        document.getElementById('refreshBlacklistButton').addEventListener('click', loadBlacklist);
+        document.getElementById('blacklistAddForm').addEventListener('submit', async (e) => { e.preventDefault(); const button = document.getElementById('blacklistAddButton'); const ip = document.getElementById('ipBlacklistAdd').value; await adminFetch('/api/admin/blacklist/add', { method: 'POST', body: JSON.stringify({ ip: ip }), button: button }); document.getElementById('ipBlacklistAdd').value = ''; loadBlacklist(); });
+        document.getElementById('blacklistRemoveForm').addEventListener('submit', async (e) => { e.preventDefault(); const button = document.getElementById('blacklistRemoveButton'); const ip = document.getElementById('ipBlacklistRemove').value; await adminFetch('/api/admin/blacklist/remove', { method: 'POST', body: JSON.stringify({ ip: ip }), button: button }); document.getElementById('ipBlacklistRemove').value = ''; loadBlacklist(); });
+
+        // --- [BARU] SECTION: PENGATURAN API KEY ---
+        async function loadApiKeyRequirements() {
+            const tableBody = document.getElementById('apiKeyReqTableBody');
+            tableBody.innerHTML = '<tr><td colspan="4" class="table-placeholder"><i class="fa fa-spinner fa-spin"></i> Loading data...</td></tr>';
+            const data = await adminFetch('/api/admin/apikey-requirements/list', { method: 'GET' });
+
+            if (data && data.requirements) {
+                if (data.requirements.length === 0) { tableBody.innerHTML = '<tr><td colspan="4" class="table-placeholder">Tidak ada endpoint ditemukan.</td></tr>'; }
+                else {
+                    tableBody.innerHTML = data.requirements.map(item => {
+                        const initialStatus = item.initial ? '<span class="status-badge initial-yes" title="Wajib berdasarkan settings.json">Wajib (Default)</span>' : '<span class="status-badge initial-no" title="Publik berdasarkan settings.json">Publik (Default)</span>';
+                        const currentStatus = item.current ? '<span class="status-badge req-key-yes">Wajib</span>' : '<span class="status-badge req-key-no">Publik</span>';
+                        const isCurrentlyRequired = item.current;
+                        const toggleId = `toggle-${item.path.replace(/[^a-zA-Z0-9]/g, '-')}`;
+
+                        return `<tr> <td><code>${item.path}</code></td> <td>${initialStatus}</td> <td>${currentStatus} ${item.current !== item.initial ? '<small style="color: var(--gray-500);">(Diubah)</small>' : ''}</td> <td> <label class="switch" title="${isCurrentlyRequired ? 'Klik untuk menjadikan Publik' : 'Klik untuk mewajibkan API Key'}"> <input type="checkbox" id="${toggleId}" ${isCurrentlyRequired ? 'checked' : ''} onchange="handleToggleApiKeyReq('${item.path}', this.checked, this)"> <span class="slider"></span> </label> </td> </tr>`;
+                    }).join('');
+                }
+            } else { tableBody.innerHTML = '<tr><td colspan="4" class="table-placeholder"><i class="fa fa-exclamation-triangle"></i> Gagal memuat data. Coba refresh.</td></tr>'; }
+        }
+
+        async function handleToggleApiKeyReq(path, require, checkboxElement) {
+            if (checkboxElement) checkboxElement.disabled = true; // Nonaktifkan switch sementara
+            const originalState = !require; // State sebelum diubah
+            
+            console.log(`Mengubah ${path} menjadi ${require ? 'WAJIB' : 'PUBLIK'} API Key...`);
+            const data = await adminFetch('/api/admin/apikey-requirements/set', {
+                method: 'POST', body: JSON.stringify({ path: path, require: require })
+            });
+            
+            if (data) { 
+                 // Muat ulang tabel untuk konfirmasi perubahan
+                loadApiKeyRequirements();
+                 // Beri notifikasi tambahan
+                showAdminNotification('Perubahan disimpan. Refresh halaman utama (index.html) mungkin diperlukan untuk melihat efeknya di modal "Try it now".', 'success');
+            } else {
+                 // Jika gagal, kembalikan switch ke posisi semula
+                if (checkboxElement) {
+                    checkboxElement.checked = originalState;
+                    checkboxElement.disabled = false;
+                }
+                showAdminNotification('Gagal menyimpan perubahan. Status dikembalikan.', 'error');
+            }
+        }
+        document.getElementById('refreshApiKeyReqButton').addEventListener('click', loadApiKeyRequirements);
+        // --- [AKHIR BARU] ---
+
+        // --- SECTION: ENDPOINT LABEL ---
+        async function loadEndpointList() {
+            const selectEl = document.getElementById('endpointPath'); if (!selectEl) return;
+            if (selectEl.options.length > 1 && selectEl.options[0].value === "") return;
+            selectEl.disabled = true; selectEl.innerHTML = '<option value="">Loading endpoints...</option>';
+            const data = await adminFetch('/api/admin/endpoints/list', { method: 'GET' });
+            if (data && data.paths) { selectEl.innerHTML = '<option value="">-- Pilih Endpoint --</option>'; data.paths.forEach(path => { selectEl.innerHTML += `<option value="${path}">${path}</option>`; }); }
+            else { selectEl.innerHTML = '<option value="">Gagal memuat</option>'; }
+            selectEl.disabled = false;
+        }
+        document.getElementById('endpointLabelForm').addEventListener('submit', async (e) => { e.preventDefault(); const button = document.getElementById('endpointLabelButton'); const endpoint = document.getElementById('endpointPath').value; const label = document.getElementById('endpointLabel').value; if (!endpoint) { showAdminNotification('Silakan pilih endpoint terlebih dahulu.', 'error'); return; } await adminFetch('/api/admin/set-label', { method: 'POST', body: JSON.stringify({ endpoint: endpoint, label: label }), button: button }); document.getElementById('endpointLabel').value = ''; document.getElementById('endpointPath').selectedIndex = 0; });
+
+        // --- SECTION KUNCI KUSTOM ---
+        async function loadCustomKeys() {
+            const tableBody = document.getElementById('customKeysTableBody'); tableBody.innerHTML = '<tr><td colspan="6" class="table-placeholder">Loading data...</td></tr>';
+            const data = await adminFetch('/api/admin/customkeys/list', { method: 'GET' });
+            if (data && data.keys) {
+                if (data.keys.length === 0) { tableBody.innerHTML = '<tr><td colspan="6" class="table-placeholder">Belum ada kunci kustom.</td></tr>'; }
+                else { tableBody.innerHTML = data.keys.map(key => { const usage = key.limit === 0 ? `${key.count} / ∞` : `${key.count} / ${key.limit}`; const isInvalid = key.isExpired || key.isOutOfLimit; let statusBadge = ''; if (key.isExpired) statusBadge = '<span class="status-badge key-expired">Expired</span>'; else if (key.isOutOfLimit) statusBadge = '<span class="status-badge key-expired">Limit Habis</span>'; else if (key.limit === 0) statusBadge = '<span class="status-badge key-nolimit">Unlimited</span>'; else statusBadge = '<span class="status-badge key-valid">Aktif</span>'; return `<tr class="${isInvalid ? 'expired-row' : ''}"> <td>${key.name}</td> <td> <div class="key-cell-container"> <span class="key-cell">${key.key}</span> <button class="btn btn-secondary btn-sm" onclick="copyToClipboard('${key.key}', this)" title="Copy Key"><i class="fa fa-copy"></i></button> </div> </td> <td>${usage}</td> <td>${formatExpiry(key.expires)}</td> <td>${statusBadge}</td> <td><button class="btn btn-danger btn-sm" onclick="handleDeleteKey('${key.key}', this)" title="Hapus Key"><i class="fa fa-trash"></i></button></td> </tr>`;}).join(''); }
+            } else { tableBody.innerHTML = '<tr><td colspan="6" class="table-placeholder">Gagal memuat data.</td></tr>'; }
+        }
+        document.getElementById('refreshCustomKeysButton').addEventListener('click', loadCustomKeys);
+        document.getElementById('customKeyAddForm').addEventListener('submit', async (e) => { e.preventDefault(); const button = document.getElementById('customKeyAddButton'); const name = document.getElementById('customKeyName').value; const key = document.getElementById('customKeyString').value; const limit = document.getElementById('customKeyLimit').value; const days = document.getElementById('customKeyDays').value; const responseEl = document.getElementById('responseCustomKeyAdd'); if (!key || key.trim() === '') { showAdminNotification('API Key tidak boleh kosong.', 'error'); return; } const data = await adminFetch('/api/admin/customkeys/add', { method: 'POST', body: JSON.stringify({ name: name, key: key.trim(), limit: limit, days: days }), button: button }); if (data && data.newKey) { showAdminNotification(data.message, 'success'); responseEl.style.display = 'block'; responseEl.style.padding = '1rem'; responseEl.style.background = 'var(--gray-100)'; responseEl.style.borderRadius = '0.375rem'; responseEl.innerHTML = `Kunci baru: <code>${data.newKey}</code> <button type="button" class="btn btn-secondary btn-sm" style="margin-left: 10px;" onclick="copyToClipboard('${data.newKey}', this)"><i class="fa fa-copy"></i> Copy</button>`; e.target.reset(); document.getElementById('customKeyName').value = 'Riki shop'; document.getElementById('customKeyString').value = ''; document.getElementById('customKeyLimit').value = '6000'; document.getElementById('customKeyDays').value = '30'; loadCustomKeys(); } else { responseEl.style.display = 'none'; } });
+        async function handleDeleteKey(key, buttonEl) { if (!confirm(`Apakah Anda yakin ingin menghapus kunci ini?\n${key}\nAksi ini tidak bisa dibatalkan.`)) return; const data = await adminFetch('/api/admin/customkeys/delete', { method: 'POST', body: JSON.stringify({ key: key }), button: buttonEl }); if (data) loadCustomKeys(); }
+
+        // --- Inisialisasi Halaman ---
+        document.addEventListener('DOMContentLoaded', () => {
+            showSection('dashboardSection'); // Section default
+            loadLimitStatus(); // Load data awal dashboard
+        });
+    </script>
+</body>
+</html>
