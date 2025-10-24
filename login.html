@@ -3,164 +3,353 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <title>Admin Login - Rikishopreal API</title>
+    <link rel="icon" href="/icon.png" type="image/png"> <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <style>
         :root {
-            --primary: #6366f1; --primary-dark: #4f46e5; --primary-light: #818cf8;
-            --gray-100: #f3f4f6; --gray-300: #d1d5db; --gray-500: #6b7280;
-            --gray-600: #4b5563; --gray-700: #374151; --gray-900: #111827;
-            --red-100: #fee2e2; --red-700: #b91c1c; --red-border: #fecaca;
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #818cf8;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb; /* Tambahkan warna abu-abu baru */
+            --gray-300: #d1d5db;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-900: #111827;
+            --red-100: #fee2e2;
+            --red-700: #b91c1c;
+            --red-border: #fecaca;
             --white: #ffffff;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
-            --ring-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* Shadow lebih lembut */
+            --ring-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25); /* Ring shadow sedikit lebih jelas */
+            --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --gradient-start: #a5b4fc; /* Warna gradient awal */
+            --gradient-end: #6366f1;   /* Warna gradient akhir */
         }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background: var(--gray-100);
+            font-family: var(--font-sans);
+            /* Gradient Background */
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
             display: flex;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
             margin: 0;
             padding: 1rem;
+            overflow: hidden; /* Hindari scrollbar dari animasi */
         }
+
+        /* [BARU] Animasi background bubble */
+        .background-bubbles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none; /* Agar tidak mengganggu interaksi */
+        }
+
+        .bubble {
+            position: absolute;
+            bottom: -150px; /* Mulai dari bawah layar */
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.15); /* Warna bubble transparan */
+            border-radius: 50%;
+            opacity: 0;
+            animation: rise 10s infinite ease-in;
+        }
+
+        .bubble:nth-child(1) { width: 40px; height: 40px; left: 10%; animation-duration: 8s; }
+        .bubble:nth-child(2) { width: 20px; height: 20px; left: 20%; animation-duration: 5s; animation-delay: 1s; }
+        .bubble:nth-child(3) { width: 50px; height: 50px; left: 35%; animation-duration: 7s; animation-delay: 2s; }
+        .bubble:nth-child(4) { width: 80px; height: 80px; left: 50%; animation-duration: 11s; animation-delay: 0s; }
+        .bubble:nth-child(5) { width: 35px; height: 35px; left: 55%; animation-duration: 6s; animation-delay: 1s; }
+        .bubble:nth-child(6) { width: 45px; height: 45px; left: 65%; animation-duration: 8s; animation-delay: 3s; }
+        .bubble:nth-child(7) { width: 90px; height: 90px; left: 70%; animation-duration: 12s; animation-delay: 2s; }
+        .bubble:nth-child(8) { width: 25px; height: 25px; left: 80%; animation-duration: 6s; animation-delay: 2s; }
+        .bubble:nth-child(9) { width: 15px; height: 15px; left: 70%; animation-duration: 5s; animation-delay: 1s; }
+        .bubble:nth-child(10) { width: 90px; height: 90px; left: 25%; animation-duration: 10s; animation-delay: 4s; }
+
+        @keyframes rise {
+            0% {
+                transform: translateY(0);
+                opacity: 0;
+            }
+            10% {
+                 opacity: 1; /* Muncul perlahan */
+            }
+            90% {
+                 opacity: 1; /* Tetap terlihat */
+            }
+            100% {
+                transform: translateY(-100vh); /* Naik ke atas layar */
+                 opacity: 0; /* Hilang perlahan */
+            }
+        }
+        /* Akhir animasi background bubble */
+
+        .login-container {
+            position: relative; /* Agar di atas bubble */
+            z-index: 1;
+             animation: fadeInScaleUp 0.6s ease-out forwards; /* Animasi muncul */
+             opacity: 0;
+             transform: scale(0.95);
+        }
+
+         @keyframes fadeInScaleUp {
+             from { opacity: 0; transform: scale(0.95) translateY(10px); }
+             to { opacity: 1; transform: scale(1) translateY(0); }
+         }
+
         .login-card {
             background: var(--white);
-            border-radius: 0.75rem;
+            border-radius: 1rem; /* Lebih rounded */
             box-shadow: var(--shadow);
             width: 100%;
             max-width: 400px;
             overflow: hidden;
+             border: 1px solid rgba(0,0,0,0.05); /* Border tipis */
         }
+
         .card-header {
             padding: 1.5rem 1.5rem 1rem 1.5rem;
             text-align: center;
-            border-bottom: 1px solid var(--gray-100);
+            /* Hapus border bawah */
         }
+
+         /* [BARU] Tambahkan logo */
+         .logo-container {
+             margin-bottom: 1rem;
+         }
+         .logo-container img {
+             width: 60px; /* Sesuaikan ukuran logo */
+             height: 60px;
+             border-radius: 8px;
+             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+         }
+
         .card-header h1 {
             margin: 0;
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: var(--primary);
+            font-size: 1.6rem; /* Sedikit lebih besar */
+            font-weight: 700; /* Lebih tebal */
+            color: var(--primary-dark); /* Warna lebih gelap */
+            letter-spacing: -0.5px; /* Spasi huruf sedikit rapat */
         }
+
         .card-body {
-            padding: 1.5rem;
+            padding: 1.5rem 2rem 2rem 2rem; /* Padding lebih besar */
         }
+
         .form-group {
-            margin-bottom: 1.25rem;
+            margin-bottom: 1.5rem; /* Jarak lebih besar */
         }
+
         label {
             display: block;
-            font-weight: 500;
-            margin-bottom: 0.375rem;
+            font-weight: 600; /* Lebih tebal */
+            margin-bottom: 0.5rem; /* Jarak ke input */
             color: var(--gray-600);
-            font-size: 0.875rem;
+            font-size: 0.9rem;
         }
+
+        .input-wrapper { /* [BARU] Wrapper untuk ikon */
+            position: relative;
+        }
+
+         .input-wrapper i { /* [BARU] Styling ikon */
+             position: absolute;
+             left: 1rem;
+             top: 50%;
+             transform: translateY(-50%);
+             color: var(--gray-500);
+             transition: color 0.2s ease;
+         }
+
         input {
             display: block;
             width: 100%;
-            padding: 0.625rem 0.75rem;
-            font-size: 0.95rem;
-            border-radius: 0.375rem;
+            padding: 0.8rem 1rem 0.8rem 2.8rem; /* Padding lebih besar, tambah padding kiri untuk ikon */
+            font-size: 1rem;
+            border-radius: 0.5rem; /* Lebih rounded */
             border: 1px solid var(--gray-300);
             box-sizing: border-box;
-            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-family: var(--font-sans); /* Ganti ke font sans-serif biasa */
             transition: border-color 0.2s, box-shadow 0.2s;
+            background-color: var(--gray-100); /* Warna background input */
         }
+
         input:focus {
             outline: none;
             border-color: var(--primary);
             box-shadow: var(--ring-shadow);
+            background-color: var(--white); /* Warna background saat fokus */
         }
+         input:focus + i { /* [BARU] Ubah warna ikon saat input fokus */
+             color: var(--primary);
+         }
+
         button {
             display: flex;
             align-items: center;
             justify-content: center;
             width: 100%;
-            background: var(--primary);
+            background: linear-gradient(135deg, var(--primary-light), var(--primary)); /* Gradient button */
             color: var(--white);
-            font-weight: 500;
+            font-weight: 600; /* Lebih tebal */
             cursor: pointer;
             border: none;
-            transition: background-color 0.2s, transform 0.1s;
-            margin-top: 0.5rem;
-            padding: 0.75rem 1rem;
+            transition: all 0.2s ease; /* Transisi lebih halus */
+            margin-top: 1rem; /* Jarak dari input */
+            padding: 0.8rem 1rem; /* Padding button */
             font-size: 1rem;
-            border-radius: 0.375rem;
+            border-radius: 0.5rem; /* Lebih rounded */
+            box-shadow: 0 4px 6px rgba(99, 102, 241, 0.2); /* Shadow button */
+            text-transform: uppercase; /* Uppercase text */
+            letter-spacing: 0.5px;
         }
+
         button i {
-            margin-right: 0.5rem;
+            margin-right: 0.6rem;
         }
+
         button:hover:not(:disabled) {
-            background: var(--primary-dark);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark)); /* Gradient hover */
+            box-shadow: 0 6px 10px rgba(99, 102, 241, 0.3); /* Shadow hover lebih besar */
+            transform: translateY(-2px); /* Efek naik sedikit */
         }
+         button:active:not(:disabled) {
+             transform: translateY(0); /* Kembali ke posisi awal saat diklik */
+             box-shadow: 0 4px 6px rgba(99, 102, 241, 0.2);
+         }
+
         button:disabled {
-            background: var(--primary-light);
+            background: var(--gray-300); /* Warna disabled lebih jelas */
+             box-shadow: none;
             cursor: not-allowed;
+            opacity: 0.7;
         }
+
         .response {
-            margin-top: 1rem;
-            padding: 0.75rem 1rem;
-            border-radius: 0.375rem;
+            margin-top: 1.5rem; /* Jarak lebih besar */
+            padding: 0.8rem 1rem;
+            border-radius: 0.5rem; /* Lebih rounded */
             font-weight: 500;
             display: none; /* Mulai tersembunyi */
             text-align: center;
-            font-size: 0.875rem;
+            font-size: 0.9rem;
             background: var(--red-100);
             color: var(--red-700);
             border: 1px solid var(--red-border);
+            animation: shake 0.5s ease-in-out; /* Animasi shake saat muncul */
         }
+
+         @keyframes shake {
+             0%, 100% { transform: translateX(0); }
+             10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+             20%, 40%, 60%, 80% { transform: translateX(5px); }
+         }
+
         /* Style tambahan jika sukses (meski tidak dipakai di sini) */
         .response.success {
              background: var(--green-100);
              color: var(--green-700);
              border: 1px solid var(--green-border);
+             animation: none; /* Tidak perlu shake untuk sukses */
         }
+
+         /* Footer Kecil */
+         .footer-text {
+             margin-top: 2rem;
+             text-align: center;
+             font-size: 0.85rem;
+             color: rgba(255, 255, 255, 0.8); /* Warna putih transparan */
+         }
+         .footer-text a {
+             color: var(--white);
+             font-weight: 600;
+             text-decoration: none;
+         }
+         .footer-text a:hover {
+             text-decoration: underline;
+         }
     </style>
 </head>
 <body>
-    <div class="login-card">
-        <div class="card-header">
-            <h1>Admin Login</h1>
+    <div class="background-bubbles">
+        <div class="bubble"></div> <div class="bubble"></div> <div class="bubble"></div>
+        <div class="bubble"></div> <div class="bubble"></div> <div class="bubble"></div>
+        <div class="bubble"></div> <div class="bubble"></div> <div class="bubble"></div>
+        <div class="bubble"></div>
+    </div>
+
+    <div class="login-container">
+        <div class="login-card">
+            <div class="card-header">
+                <div class="logo-container">
+                    <img src="/icon.png" alt="API Logo"> </div>
+                <h1>Admin Panel Login</h1>
+            </div>
+            <div class="card-body">
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <div class="input-wrapper">
+                             <input type="password" id="password" name="password" required placeholder="Masukkan password admin...">
+                            <i class="fa fa-lock"></i> </div>
+                    </div>
+                    <button type="submit" id="loginButton">
+                        <span class="button-icon"><i class="fa fa-sign-in-alt"></i></span>
+                        <span class="button-text">Login</span>
+                    </button>
+                </form>
+                <div id="response" class="response"></div>
+             </div>
         </div>
-        <div class="card-body">
-            <form id="loginForm">
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" required>
-                </div>
-                <button type="submit" id="loginButton">
-                    <i class="fa fa-sign-in-alt"></i> Login
-                </button>
-            </form>
-            <div id="response" class="response"></div> </div>
+
+        <div class="footer-text">
+            © <span id="currentYear"></span> <a href="https://rikishopreal.cintaibu.biz.id" target="_blank">Rikishopreal</a> API.
+        </div>
     </div>
 
     <script>
+        document.getElementById('currentYear').textContent = new Date().getFullYear(); // Set tahun di footer
+
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             const passwordInput = document.getElementById('password');
             const password = passwordInput.value;
             const button = document.getElementById('loginButton');
             const responseEl = document.getElementById('response');
+            const buttonTextEl = button.querySelector('.button-text');
+            const buttonIconEl = button.querySelector('.button-icon'); // Dapatkan elemen ikon
 
             // Reset notifikasi
             responseEl.style.display = 'none';
             responseEl.textContent = '';
             responseEl.className = 'response'; // Reset ke class dasar (merah)
 
-            // Validasi input kosong (opsional tapi bagus)
             if (!password) {
                 responseEl.textContent = 'Password tidak boleh kosong.';
                 responseEl.style.display = 'block';
-                passwordInput.focus(); // Fokus ke input password
-                return; // Stop eksekusi
+                passwordInput.focus();
+                return;
             }
 
             button.disabled = true;
-            button.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Logging in...';
+            // Ubah teks dan ikon saat loading
+            if (buttonTextEl) buttonTextEl.textContent = 'Logging in...';
+            if (buttonIconEl) buttonIconEl.innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
+
 
             try {
                 const res = await fetch('/api/admin/login', {
@@ -169,25 +358,35 @@
                     body: JSON.stringify({ password: password })
                 });
 
-                const data = await res.json();
+                // Coba parse JSON, tangani jika bukan JSON
+                let data;
+                const contentType = res.headers.get("content-type");
+                if (contentType && contentType.indexOf("application/json") !== -1) {
+                    data = await res.json();
+                } else {
+                    // Jika bukan JSON, anggap error server
+                    throw new Error(`Server error (${res.status}): Respons bukan JSON.`);
+                }
+
 
                 if (!res.ok) {
-                    // Ambil pesan error dari server jika ada
                     throw new Error(data.error || `Login failed (${res.status})`);
                 }
 
-                // Jika sukses, simpan ADMIN_API_KEY (token) ke session
                 sessionStorage.setItem('adminApiKey', data.token);
-                
-                // Arahkan ke halaman admin-panel yang baru
                 window.location.href = '/admin-panel';
 
             } catch (err) {
-                // Tampilkan pesan error di elemen notifikasi
                 responseEl.textContent = `Error: ${err.message}`;
                 responseEl.style.display = 'block';
-                button.disabled = false;
-                button.innerHTML = '<i class="fa fa-sign-in-alt"></i> Login';
+                 // Kembalikan teks dan ikon button
+                 button.disabled = false;
+                 if (buttonTextEl) buttonTextEl.textContent = 'Login';
+                 if (buttonIconEl) buttonIconEl.innerHTML = '<i class="fa fa-sign-in-alt"></i>';
+                // Tambahkan class untuk animasi shake lagi (jika diinginkan)
+                responseEl.style.animation = 'none'; // Reset animasi
+                void responseEl.offsetWidth; // Trigger reflow
+                responseEl.style.animation = 'shake 0.5s ease-in-out';
             }
         });
     </script>

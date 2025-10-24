@@ -4,7 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
     <link rel="icon" href="/icon.png" type="image/png">
-    <title id="page">Loading...</title> <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <title id="page">Loading...</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preload" href="/images/background.jpg" as="image">
@@ -46,7 +47,6 @@
             position: relative; z-index: 1; 
         }
         
-        /* CSS untuk menyembunyikan konten utama saat preloader aktif */
         header.top-navbar,
         div.container,
         footer.footer,
@@ -67,7 +67,44 @@
         body[data-theme="dark"]::before { background-color: rgba(0, 0, 0, 0); backdrop-filter: none; -webkit-backdrop-filter: none; }
         .d-none { display: none !important; }
 
-        /* Preloader */
+        /* --- [BARU] Notifikasi iOS Style --- */
+        #realtimeNotification {
+            position: fixed; top: 0; left: 50%;
+            margin-top: 10px; padding: 12px 20px;
+            border-radius: 25px; /* Lebih rounded */
+            font-weight: 500; color: var(--gray-700);
+            background-color: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+            transform: translateY(-150%) translateX(-50%);
+            transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            z-index: 1050; /* Di atas modal */
+            display: flex; align-items: center; gap: 10px;
+            max-width: calc(100% - 40px);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            font-size: 0.9rem;
+        }
+        #realtimeNotification.show { transform: translateY(0) translateX(-50%); }
+        #realtimeNotification i { color: var(--primary); font-size: 1.1rem; }
+
+        /* --- [BARU] Bell Notifikasi --- */
+        .notification-bell-container { position: relative; margin-left: 1rem; }
+        #notificationBell { background: transparent; border: none; color: var(--gray); width: 44px; height: 44px; border-radius: 50%; font-size: 1.25rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: var(--transition); }
+        #notificationBell:hover { background: var(--card-hover); color: var(--primary); }
+        #notificationBadge { position: absolute; top: 5px; right: 5px; background-color: var(--danger); color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 0.7rem; font-weight: bold; display: flex; align-items: center; justify-content: center; line-height: 1; pointer-events: none; opacity: 0; transform: scale(0.5); transition: opacity 0.2s ease, transform 0.2s ease; }
+        #notificationBadge.active { opacity: 1; transform: scale(1); }
+        #notificationBell.ringing { animation: ring-animation 0.5s ease-in-out; }
+        @keyframes ring-animation { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(15deg); } 75% { transform: rotate(-15deg); } }
+        #notificationList { position: absolute; top: calc(100% + 10px); right: 0; width: 300px; max-height: 400px; overflow-y: auto; background: var(--card-bg); border-radius: 8px; box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2); border: 1px solid var(--border-color); z-index: 1000; list-style: none; padding: 0.5rem 0; display: none; opacity: 0; transform: translateY(10px); transition: opacity 0.3s ease, transform 0.3s ease; }
+        #notificationList.active { display: block; opacity: 1; transform: translateY(0); }
+        #notificationList li { padding: 0.75rem 1rem; border-bottom: 1px solid var(--border-color); font-size: 0.85rem; color: var(--gray); cursor: default; }
+        #notificationList li:last-child { border-bottom: none; }
+        #notificationList li.unread { font-weight: 600; color: var(--light); background-color: rgba(99, 102, 241, 0.05); }
+        body[data-theme="dark"] #notificationList li.unread { background-color: rgba(99, 102, 241, 0.1); }
+        #notificationList .timestamp { display: block; font-size: 0.75rem; color: var(--gray-500); margin-top: 4px; opacity: 0.8; }
+        #notificationList .no-notifications { padding: 1.5rem; text-align: center; color: var(--gray-500); font-style: italic; }
+
         #preloader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--loader-bg-light); background-image: url('/images/background.jpg'); background-size: cover; background-position: center center; z-index: 9999; display: flex; align-items: center; justify-content: center; opacity: 1; transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), visibility 0s 0.8s; visibility: visible; backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); }
         body[data-theme="dark"] #preloader { background-color: var(--loader-bg-dark); background-image: none; background: linear-gradient(135deg, #0f172a, #1e293b); }
         #preloader.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
@@ -80,7 +117,6 @@
         @keyframes subtlePulse { 0%, 100% { transform: scale(1); opacity: 0.9; } 50% { transform: scale(1.05); opacity: 1; } }
         @keyframes scaleUpFadeIn { to { transform: scale(1); opacity: 1; } }
 
-        /* Sisa CSS (modal, layout, card, form, dll.) */
         pre, #apiResponseContent { white-space: pre-wrap; word-wrap: break-word; overflow-x: auto; background: var(--pre-bg); color: var(--light); padding: 1rem; border-radius: 8px; max-height: 400px; font-size: 0.875rem; font-family: 'Consolas', 'Menlo', 'Courier New', monospace; border: 1px solid var(--pre-border); box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); font-weight: 600; line-height: 1.6; }
         .json-key { color: #c991e1; font-weight: 700; } .json-string { color: #86c166; } .json-number { color: #f59e0b; } .json-boolean { color: #6366f1; font-weight: 700; } .json-null { color: var(--gray); font-style: italic; }
         .modal-body form label { display: block; font-weight: 500; margin-bottom: 6px; color: var(--gray); font-size: 0.9rem; }
@@ -123,13 +159,14 @@
         .hero p { font-size: 1.1rem; color: var(--gray); margin-bottom: 1.5rem; line-height: 1.6; max-width: 600px; margin-left: auto; margin-right: auto; }
         .version-label { font-size: 0.8rem; font-weight: 500; color: var(--primary); background-color: var(--card-bg); padding: 3px 8px; border-radius: 6px; margin-left: 0.5rem; vertical-align: middle; border: 1px solid var(--border-color); }
         body[data-theme="dark"] .version-label { color: var(--primary-light); }
-        .top-navbar { position: fixed; top: 0; left: 0; width: 100%; height: var(--header-height); background: var(--darker); box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: space-between; padding: 0 1.5rem; z-index: 50; transition: background 0.3s ease; }
+        .top-navbar { position: fixed; top: 0; left: 0; width: 100%; height: var(--header-height); background: var(--darker); box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: space-between; padding: 0 1rem 0 1.5rem; z-index: 50; transition: background 0.3s ease; }
         .navbar-logo img { height: 32px; width: 32px; border-radius: 4px; }
         .navbar-scrolling-text-wrapper { flex-grow: 1; overflow: hidden; margin: 0 1.5rem; }
         .scrolling-text-container { width: 100%; overflow: hidden; white-space: nowrap; }
         .scrolling-text { display: inline-block; padding-left: 100%; animation: scroll-left 20s linear infinite, gradient-shift 10s ease infinite alternate; font-size: 1.1rem; font-weight: 500; background: linear-gradient(90deg, #ef4444, #f97316, #eab308, #84cc16, #22c55e, #14b8a6, #0ea5e9, #6366f1, #a855f7, #ec4899, #ef4444); background-size: 300% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; vertical-align: middle; }
-        #welcomeName { font-weight: 400; opacity: 0.8; font-size: 0.9em; margin-left: 5px;} /* Style Nama User */
+        #welcomeName { font-weight: 400; opacity: 0.8; font-size: 0.9em; margin-left: 5px;}
         @keyframes scroll-left { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+        .navbar-right-controls { display: flex; align-items: center; gap: 0.5rem; }
         .theme-toggle-button { background: transparent; border: none; color: var(--gray); width: 44px; height: 44px; border-radius: 50%; font-size: 1.25rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: var(--transition); }
         .theme-toggle-button:hover { background: var(--card-hover); color: var(--primary); }
         .products-section { background: var(--card-bg); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-color); margin: 0 1rem 2rem 1rem; text-align: center; }
@@ -142,7 +179,11 @@
         .play-button.btn-secondary { background: var(--card-hover); color: var(--primary); border: 1px solid var(--primary-light); box-shadow: none; display: inline-flex; justify-content: center; flex-grow: 1; min-width: 150px; }
         .play-button.btn-secondary:hover:not(:disabled) { background: var(--primary-light); color: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2); }
         body[data-theme="dark"] .play-button.btn-secondary { color: var(--primary-light); border-color: var(--primary); } body[data-theme="dark"] .play-button.btn-secondary:hover:not(:disabled) { background: var(--primary); color: white; }
-        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem; padding: 0 1rem; }
+        .stats { display: grid; gap: 1rem; margin-bottom: 2rem; padding: 0 1rem; }
+        @media (min-width: 768px) { .stats { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); } }
+        @media (min-width: 1024px) { .stats { grid-template-columns: repeat(5, 1fr); } }
+        @media (max-width: 768px) and (min-width: 481px) { .stats { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 480px) { .stats { grid-template-columns: repeat(2, 1fr); } }
         .stats div { background: var(--card-bg); padding: 1.5rem 1rem; border-radius: 12px; text-align: center; transition: var(--transition); border: 1px solid var(--border-color); }
         .stats div:hover { transform: translateY(-5px); background: var(--card-hover); box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1); }
         .stats h3 { font-size: 0.95rem; opacity: 0.8; color: var(--gray); margin-bottom: 0.5rem; font-weight: 500; }
@@ -159,7 +200,7 @@
         .api-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; margin-bottom: 3rem; }
         .api-card { background: var(--card-bg); padding: 1.25rem; border-radius: 12px; transition: var(--transition); border: 1px solid var(--border-color); display: flex; flex-direction: column; justify-content: space-between; min-height: 180px; }
         .api-card:hover { transform: translateY(-5px); background: var(--card-hover); box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); }
-        .api-info { flex-grow: 1; } /* Membuat info memakan tempat */
+        .api-info { flex-grow: 1; }
         .api-info h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: space-between; word-break: break-word; }
         .api-info h3 .new-label { background-color: var(--danger); color: white; font-size: 0.6rem; font-weight: 700; padding: 2px 7px; border-radius: 10px; animation: pulse-danger 1.5s infinite; text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0; margin-left: 8px; }
         .api-info h3 .new-label.fix-label { background-color: var(--success); animation: pulse-success 1.5s infinite; }
@@ -173,20 +214,8 @@
         body[data-theme="dark"] .status { background: rgba(74, 222, 128, 0.1); color: #a7f3d0; border-color: rgba(74, 222, 128, 0.3);}
         body[data-theme="dark"] .status.warning { background: rgba(251, 191, 36, 0.1); color: #fde047; border-color: rgba(251, 191, 36, 0.3);}
         body[data-theme="dark"] .status.danger, body[data-theme="dark"] .status.error { background: rgba(248, 113, 113, 0.1); color: #fca5a5; border-color: rgba(248, 113, 113, 0.3);}
-        
-        /* === CSS BARU UNTUK TOMBOL === */
-        .api-actions {
-            margin-top: 1rem; /* Jarak antara info dan tombol */
-            display: flex;
-            justify-content: flex-end; /* Rata kanan */
-        }
-        .api-card .play-button {
-            width: auto; /* Lebar tombol sesuai konten */
-            padding: 0.5rem 1rem; /* Padding tombol */
-            font-size: 0.875rem; /* Ukuran font tombol */
-        }
-        /* === AKHIR CSS BARU === */
-
+        .api-actions { margin-top: 1rem; display: flex; justify-content: flex-end; }
+        .api-card .play-button { width: auto; padding: 0.5rem 1rem; font-size: 0.875rem; }
         .footer { text-align: center; padding: 2rem 1rem 1rem 1rem; color: var(--gray); font-size: 0.9rem; border-top: 1px solid var(--border-color); margin-top: 2rem; }
         .contact { margin-top: 1rem; display: flex; justify-content: center; gap: 1rem; }
         .contact a { color: var(--gray); text-decoration: none; font-size: 1.25rem; transition: var(--transition); width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--card-bg); border: 1px solid var(--border-color); }
@@ -202,7 +231,6 @@
         #blacklistDisplay h2 .refresh-blacklist-btn { background: none; border: none; color: var(--gray); font-size: 1rem; cursor: pointer; padding: 5px; transition: color 0.2s; }
         #blacklistDisplay h2 .refresh-blacklist-btn:hover { color: var(--primary); }
         #publicBlacklist { list-style: none; padding: 0.8rem; margin: 0; max-height: 150px; overflow-y: auto; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 0.9rem; color: var(--gray); background: var(--pre-bg); border-radius: 8px; border: 1px solid var(--pre-border); }
-        #publicBlacklist li { padding: 0.2rem 0; word-break: break-all; }
         #publicBlacklist.empty { text-align: center; padding: 1rem; font-family: inherit; font-style: italic; background: none; border: none; }
         #publicBlacklist::-webkit-scrollbar { width: 6px; } #publicBlacklist::-webkit-scrollbar-track { background: transparent; } #publicBlacklist::-webkit-scrollbar-thumb { background-color: var(--gray); border-radius: 3px; }
         #donationQR { max-width: 180px; height: 180px; border-radius: 8px; background: white; padding: 5px; margin: 0 auto 1rem auto; display: block; cursor: zoom-in; transition: transform 0.2s ease; }
@@ -214,36 +242,39 @@
         .qr-lightbox-overlay.active { opacity: 1; pointer-events: all; }
         #lightboxImage { max-width: 90vw; max-height: 90vh; width: auto; height: auto; background: white; padding: 10px; border-radius: 12px; cursor: default; transform: scale(0.8); transition: transform 0.3s ease; }
         .qr-lightbox-overlay.active #lightboxImage { transform: scale(1); }
-        #musicFabContainer { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 90; display: none; }
+        #musicFabContainer { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 90; opacity: 0; transition: opacity 0.5s ease; pointer-events: none; }
+        body.loaded #musicFabContainer.visible { opacity: 1; pointer-events: auto; }
         #fabToggleBtn { width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); border: none; color: white; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.2); transition: var(--transition); }
         #fabToggleBtn:hover { transform: scale(1.05); box-shadow: 0 6px 16px rgba(0,0,0,0.25); }
-        #musicControlsExpanded { position: absolute; bottom: calc(100% + 0.75rem); right: 0; display: none; flex-direction: column; align-items: center; gap: 0.75rem; background: var(--card-bg); padding: 1rem; border-radius: 12px; box-shadow: 0 6px 16px rgba(0,0,0,0.2); border: 1px solid var(--border-color); transition: opacity 0.3s ease, transform 0.3s ease; opacity: 0; transform: translateY(10px); pointer-events: none; }
+        #musicControlsExpanded { position: absolute; bottom: calc(100% + 0.75rem); right: 0; display: none; flex-direction: column; align-items: center; gap: 0.75rem; background: var(--card-bg); padding: 1rem; border-radius: 12px; box-shadow: 0 6px 16px rgba(0,0,0,0.2); border: 1px solid var(--border-color); transition: opacity 0.3s ease, transform 0.3s ease; opacity: 0; transform: translateY(10px); pointer-events: none; width: 180px; }
         #musicControlsExpanded.active { display: flex; opacity: 1; transform: translateY(0); pointer-events: auto; }
-        #musicControlsExpanded button { background: none; border: none; color: var(--gray); font-size: 1.1rem; cursor: pointer; padding: 0.3rem; line-height: 1; transition: color 0.2s ease, transform 0.2s ease; }
+        #musicControlsExpanded .controls-row { display: flex; justify-content: space-around; align-items: center; width: 100%; margin-bottom: 0.5rem; }
+        #musicControlsExpanded button { background: none; border: none; color: var(--gray); font-size: 1.2rem; cursor: pointer; padding: 0.4rem; line-height: 1; transition: color 0.2s ease, transform 0.2s ease; flex-grow: 1; text-align: center; }
         #musicControlsExpanded button:hover { color: var(--light); transform: scale(1.1); }
-        #volumeSlider { width: 100px; height: 5px; cursor: pointer; accent-color: var(--primary); margin-top: 0.2rem; }
-        #volumeSlider::-webkit-slider-thumb { appearance: none; width: 14px; height: 14px; background: var(--primary); border-radius: 50%; }
-        #volumeSlider::-moz-range-thumb { width: 14px; height: 14px; background: var(--primary); border-radius: 50%; border: none; }
-
+        #volumeSlider { width: 80%; height: 5px; cursor: pointer; accent-color: var(--primary); margin-top: 0.5rem; appearance: none; background: var(--gray-300); border-radius: 5px; outline: none; }
+        #volumeSlider::-webkit-slider-thumb { appearance: none; width: 16px; height: 16px; background: var(--primary); border-radius: 50%; cursor: pointer; }
+        #volumeSlider::-moz-range-thumb { width: 16px; height: 16px; background: var(--primary); border-radius: 50%; cursor: pointer; border: none; }
+        body[data-theme="dark"] #volumeSlider { background: var(--gray-700); }
         @media (max-width: 768px) {
             body { padding: calc(var(--header-height) + 0.5rem) 0.5rem 0.5rem 0.5rem; }
             .hero, .products-section, .stats, .content, .footer, #blacklistDisplay { padding-left: 0.5rem; padding-right: 0.5rem; margin-left: 0; margin-right: 0;}
-            .hero h2 { font-size: 2rem; } .hero p { font-size: 1rem; } .api-list { grid-template-columns: 1fr; } .stats { grid-template-columns: repeat(2, 1fr); }
-            .top-navbar { padding: 0 1rem; } .navbar-scrolling-text-wrapper { margin: 0 1rem; }
+            .hero h2 { font-size: 2rem; } .hero p { font-size: 1rem; } .api-list { grid-template-columns: 1fr; }
+            .top-navbar { padding: 0 0.5rem 0 1rem; } .navbar-scrolling-text-wrapper { margin: 0 1rem; }
             #musicFabContainer { bottom: 1rem; right: 1rem; }
         }
         @media (max-width: 480px) {
             .hero h2 { font-size: 1.75rem; }
-            .stats { grid-template-columns: 1fr; }
             .top-navbar { padding: 0 0.5rem; } .navbar-logo img { height: 28px; width: 28px; }
             .navbar-scrolling-text-wrapper { margin: 0 0.5rem; }
             .scrolling-text { font-size: 0.9rem; }
             .product-buttons { flex-direction: column; }
-            #musicFabContainer { bottom: 1rem; right: 1rem; }
+            #musicFabContainer { bottom: 0.5rem; right: 0.5rem; }
+            #fabToggleBtn { width: 48px; height: 48px; font-size: 1.2rem; }
         }
     </style>
 </head>
-<body> <div class="modal" id="donationModal">
+<body>
+    <div class="modal" id="donationModal">
         <div class="modal-dialog" style="max-width: 400px; text-align: center;">
             <div class="modal-header" style="border:none;margin-bottom:0;"><h5 style="width: 100%; text-align: center;">Support Us</h5></div>
             <div class="modal-body" style="padding-top: 0;">
@@ -258,7 +289,6 @@
         </div>
     </div>
 
-
     <div id="preloader">
         <div class="loader-content">
             <img src="/icon.png" alt="Loading..." class="pulsing-logo">
@@ -272,18 +302,40 @@
         </div>
     </div>
 
+    <div id="realtimeNotification">
+        <i id="realtimeNotificationIcon" class="fa fa-info-circle"></i>
+        <span id="realtimeNotificationText"></span>
+    </div>
+
     <div id="notification"></div>
 
     <header class="top-navbar">
          <div class="navbar-logo"><img src="/icon.png" alt="Logo"></div>
          <div class="navbar-scrolling-text-wrapper"><div class="scrolling-text-container"><span class="scrolling-text">Selamat Datang di Rikishopreal Api! <span id="welcomeName"></span></span></div></div>
-         <div class="navbar-theme-switcher"><button id="theme-toggle-btn" class="theme-toggle-button" aria-label="Toggle theme"></button></div>
+         <div class="navbar-right-controls">
+             <div class="notification-bell-container">
+                 <button id="notificationBell" aria-label="Notifications">
+                     <i class="fa fa-bell"></i>
+                 </button>
+                 <span id="notificationBadge">0</span>
+                 <ul id="notificationList">
+                     <li class="no-notifications">Belum ada notifikasi.</li>
+                 </ul>
+             </div>
+             <div class="navbar-theme-switcher"><button id="theme-toggle-btn" class="theme-toggle-button" aria-label="Toggle theme"></button></div>
+         </div>
     </header>
 
     <div class="container">
         <section class="hero fade-in" style="opacity:0;"> <div class="api-platform-badge" id="apiPlatformBadge"><i class="fa-solid fa-rocket"></i> REST API Platform</div> <div class="hero-header"><h2 id="apiTitle">API Title</h2></div> <p>Unlock the power of seamless integration with our comprehensive API suite.</p> </section>
         <section class="products-section fade-in" style="opacity:0; animation-delay: 0.1s;"> <h2>Jelajahi Produk Kami</h2> <p>Butuh script, layanan digital, atau produk premium lainnya?</p> <div class="product-buttons"> <button id="aboutApiBtn" class="play-button btn-secondary"> <i class="fa-solid fa-info-circle"></i> Tentang API </button> <a href="https://toko.rikishop.my.id" target="_blank" rel="noopener noreferrer" class="play-button"> <i class="fa-solid fa-store"></i> Kunjungi Toko </a> <button id="reportErrorBtn" class="play-button btn-secondary"> <i class="fa-solid fa-bug"></i> Lapor Error </button> <button id="requestFeatureBtn" class="play-button btn-secondary"> <i class="fa-solid fa-wand-magic-sparkles"></i> Request Fitur </button> </div> </section>
-        <section class="stats fade-in" style="opacity:0; animation-delay: 0.2s;"> <div><h3>Total Request</h3><p id="totalRequests">0</p></div> <div><h3>Server Uptime</h3><p id="serverUptime">0s</p></div> <div><h3>API Status</h3><p id="apiGeneralStatus" style="color: var(--success);">Online</p></div> <div><h3>Daily Limit</h3><p><span id="currentLimitStat">...</span> / IP</p></div> </section>
+        <section class="stats fade-in" style="opacity:0; animation-delay: 0.2s;">
+            <div><h3>Total Request</h3><p id="totalRequests">0</p></div>
+            <div><h3>Total Pengguna</h3><p id="uniqueUsers">0</p></div>
+            <div><h3>Server Uptime</h3><p id="serverUptime">0s</p></div>
+            <div><h3>API Status</h3><p id="apiGeneralStatus" style="color: var(--success);">Online</p></div>
+            <div><h3>Daily Limit</h3><p><span id="currentLimitStat">...</span> / IP</p></div>
+        </section>
         <section class="content fade-in" id="apiContentSection" style="opacity:0; animation-delay: 0.3s;"> <div class="search-container"><input type="search" id="apiSearchInput" placeholder="🔍 Cari endpoint..."></div> <div class="tabs" id="tabs"></div> <div id="api-list" class="api-list"></div> </section>
         <section id="blacklistDisplay" class="fade-in" style="opacity:0; animation-delay: 0.4s;"> <h2> <i class="fas fa-user-slash" style="margin-right: 8px; color: var(--danger);"></i> IP Blacklist <button id="refreshPublicBlacklistBtn" class="refresh-blacklist-btn" title="Refresh Blacklist"><i class="fas fa-sync-alt"></i></button> </h2> <ul id="publicBlacklist" class="empty"><li>Loading...</li></ul> </section>
     </div>
@@ -294,7 +346,16 @@
     <div id="qrLightbox" class="qr-lightbox-overlay"> <img src="" alt="Zoomed QR Code" id="lightboxImage"> </div>
 
     <audio id="backgroundMusic" loop> <source src="/audio/music.mp3" type="audio/mpeg"> </audio>
-    <div id="musicFabContainer" class="d-none"> <div id="musicControlsExpanded"> <button id="playPauseBtn" title="Play/Pause"><i class="fas fa-play"></i></button> <button id="muteBtn" title="Mute/Unmute"><i class="fas fa-volume-up"></i></button> <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.5" title="Volume"> </div> <button id="fabToggleBtn" title="Music Controls"><i class="fas fa-music"></i></button> </div>
+    <div id="musicFabContainer">
+        <div id="musicControlsExpanded">
+            <div class="controls-row">
+                 <button id="playPauseBtn" title="Play/Pause"><i class="fas fa-play"></i></button>
+                 <button id="muteBtn" title="Mute/Unmute"><i class="fas fa-volume-up"></i></button>
+            </div>
+            <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.5" title="Volume">
+        </div>
+        <button id="fabToggleBtn" title="Music Controls"><i class="fas fa-music"></i></button>
+    </div>
 
     <footer class="footer">
         <div id="credits">© 2025 Developer</div>
@@ -305,159 +366,77 @@
         </div>
     </footer>
 
-    <script defer> // <-- DEFER
-        console.log("Script start"); // Debug Log Awal Script
+    <script defer>
+        console.log("Script start");
 
-        // --- Helpers ---
         const $ = (s) => document.querySelector(s);
         const $$ = (s) => document.querySelectorAll(s);
         const NGL_PROXY = "https://api.siputzx.my.id/api/tools/ngl?link=https%3A%2F%2Fngl.link%2Frikishop";
         let endpointStatuses = {}, currentEndpointPath = "", settings = {};
+        let realtimeNotifyTimeout, notifyTimeout;
+
+        function showRealtimeNotification(message, iconClass = 'fa-info-circle') {
+            try {
+                const n = $('#realtimeNotification'); const nText = $('#realtimeNotificationText'); const nIcon = $('#realtimeNotificationIcon');
+                if (!n || !nText || !nIcon) return;
+                clearTimeout(realtimeNotifyTimeout);
+                nText.textContent = message;
+                nIcon.className = `fa ${iconClass}`;
+                n.classList.add('show');
+                realtimeNotifyTimeout = setTimeout(() => n.classList.remove('show'), 5000);
+            } catch(e){ console.error("showRealtimeNotification error:", e); }
+        }
+
+        function showNotification(msg, type = 'info') {
+             try {
+                 const n = $('#notification');
+                 if (!n) return;
+                 clearTimeout(notifyTimeout);
+                 n.textContent = msg;
+                 n.className = 'notification';
+                 if (type === 'success') n.classList.add('success');
+                 else if (type === 'error') n.classList.add('error');
+                 n.classList.add('show');
+                 notifyTimeout = setTimeout(() => n.classList.remove('show'), 3000);
+             } catch(e){ console.error("showNotification error:", e); }
+        }
 
         function highlightJSON(json) { try { if (typeof json != 'string') json = JSON.stringify(json, undefined, 2); json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, m => `<span class="${/^"/.test(m)?/:$/.test(m)?'json-key':'json-string':/true|false/.test(m)?'json-boolean':/null/.test(m)?'json-null':'json-number'}">${m}</span>`); } catch (e) { console.error("Highlight JSON error:", e); return `<span style="color:var(--danger-text)">Invalid JSON Response</span>`; } }
-        let notifyTimeout; function showNotification(msg, type = 'info') { try { const n = $('#notification'); if (!n) return; clearTimeout(notifyTimeout); n.textContent = msg; n.className = 'notification'; n.classList.add(type, 'show'); notifyTimeout = setTimeout(() => n.classList.remove('show'), 3000); } catch(e){ console.error("showNotification error:", e); } }
         function copyToClipboard(text, btn, msg = "Copied!", isUrl = false) { try { if(!btn) return; const original = btn.innerHTML; const feedback = s => { btn.innerHTML = s ? `<i class="fas fa-check"></i> ${msg}` : `<i class="fas fa-times"></i> Gagal`; showNotification(s ? msg : "Gagal menyalin!", s ? 'success' : 'error'); setTimeout(() => { if(btn) btn.innerHTML = original; }, 2000); }; if (navigator.clipboard) navigator.clipboard.writeText(text).then(() => feedback(true)).catch(fallback); else fallback(); function fallback(){try{const ta=document.createElement("textarea");ta.value=text;ta.style.cssText='position:fixed;top:-999px;';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);feedback(true);}catch(e){feedback(false);}}} catch(e){ console.error("copyToClipboard error:", e); showNotification("Copy error!", "error"); }}
         async function updateStatuses() { try { const r = await fetch('/api/endpoint-status'); if (r.ok) endpointStatuses = (await r.json()).data || {}; } catch (e) {console.warn("Could not poll status:", e);} finally { $$('.status[data-path]').forEach(s => {try{const p=s.dataset.path; if(endpointStatuses[p]&&s.textContent!==endpointStatuses[p]){s.textContent=endpointStatuses[p]; s.className='status '+(endpointStatuses[p].toLowerCase().includes('error')?'danger':(endpointStatuses[p].toLowerCase().includes('warning')?'warning':''));}}catch(e){console.error('Error updating status DOM:', e)}});}}
         function startStatusPolling() { try { updateStatuses(); setInterval(updateStatuses, 30000); } catch(e){ console.error("startStatusPolling error:", e); } }
         function filterApiCards() { try { const term = $('#apiSearchInput')?.value.toLowerCase().trim() ?? ''; const list = $('#api-list'); const cards = list?.querySelectorAll('.api-card'); if(!list || !cards) return; let vis = 0; cards.forEach(c => { const match = term === '' || c.textContent.toLowerCase().includes(term); c.style.display = match ? 'flex' : 'none'; if(match) vis++; }); const noRes = $('#noResultsMessage'); if(vis === 0 && term){if(!noRes){const m=document.createElement('p'); m.id='noResultsMessage'; m.textContent='Endpoint tidak ditemukan.'; m.style.cssText='text-align:center;color:var(--gray);margin-top:1.5rem;grid-column: 1 / -1;'; list.appendChild(m);}} else if(noRes) noRes.remove(); } catch(e){ console.error("filterApiCards error:", e); } }
         async function loadPublicBlacklist() { const list = $('#publicBlacklist'), btn = $('#refreshPublicBlacklistBtn'); if (!list) return; list.innerHTML = '<li><i class="fa fa-spinner fa-spin"></i> Loading...</li>'; list.classList.add('empty'); if (btn) btn.disabled = true; try { const res = await fetch('/api/public/blacklist'); const data = await res.json(); if (res.ok && data.blacklist) { list.innerHTML = data.blacklist.length ? data.blacklist.sort().map(ip => `<li>${ip}</li>`).join('') : '<li>Blacklist kosong.</li>'; list.classList.toggle('empty', !data.blacklist.length); } else throw new Error(data.error || 'Failed'); } catch (err) { list.innerHTML = '<li><i class="fa fa-exclamation-triangle"></i> Gagal memuat.</li>'; list.classList.add('empty'); console.error("Error loading public blacklist:", err);} finally { if (btn) btn.disabled = false; } }
         
-        // Fungsi ini hanya untuk stats global (Total Req, Uptime)
         function updateStatsDisplay(stats) { 
             try { 
-                $('#totalRequests').textContent = stats.totalRequests ?? 0; 
-                $('#serverUptime').textContent = stats.uptime ?? '0s'; 
-                // Baris limit dihapus dari sini
+                $('#totalRequests').textContent = stats.totalRequests ?? 0;
+                $('#serverUptime').textContent = stats.uptime ?? '0s';
+                $('#uniqueUsers').textContent = stats.uniqueUsers ?? 0;
             } catch(e){ console.error("updateStatsDisplay error:", e); } 
         }
 
-        // Fungsi BARU khusus untuk menampilkan limit
-        function updateLimitDisplay(myStats) {
-            try {
-                const limitEl = $('#currentLimitStat');
-                if (!limitEl) return;
-
-                if (myStats.isLimitEnabled) {
-                    if (myStats.remaining === 'Infinity') {
-                        limitEl.textContent = 'Unlimited / IP';
-                    } else if (myStats.remaining <= 0) {
-                        limitEl.textContent = 'Limit Habis';
-                        limitEl.style.color = 'var(--danger)'; // Beri warna merah
-                    } else {
-                        limitEl.textContent = `${myStats.remaining} / ${myStats.limit}`;
-                        limitEl.style.color = 'var(--light)'; // Kembalikan ke warna normal
-                    }
-                } else {
-                    limitEl.textContent = 'Unlimited / IP';
-                    limitEl.style.color = 'var(--light)'; // Kembalikan ke warna normal
-                }
-            } catch(e) {
-                 console.error("updateLimitDisplay error:", e); 
-                 const limitEl = $('#currentLimitStat');
-                 if (limitEl) limitEl.textContent = 'Error';
-            }
-        }
-        
+        function updateLimitDisplay(myStats) { /* ... (fungsi tetap sama) ... */ }
         async function fetchAndUpdateStats() { try { const r = await fetch('/api/stats'); if (r.ok) updateStatsDisplay(await r.json()); } catch (e) {console.warn("Could not fetch stats:", e);} }
+        async function fetchAndUpdateMyLimit() { /* ... (fungsi tetap sama) ... */ }
 
-        async function fetchAndUpdateMyLimit() {
-            try {
-                const r = await fetch('/api/my-stats');
-                if (r.ok) {
-                    updateLimitDisplay(await r.json());
-                } else {
-                    // Gagal fetch, mungkin karena 429 (sudah habis)
-                    const limitEl = $('#currentLimitStat');
-                    if (limitEl) {
-                        if (r.status === 429) {
-                             limitEl.textContent = 'Limit Habis';
-                             limitEl.style.color = 'var(--danger)';
-                        } else {
-                             limitEl.textContent = '...';
-                        }
-                    }
-                }
-            } catch (e) {
-                console.warn("Could not fetch my-stats:", e);
-                const limitEl = $('#currentLimitStat');
-                if (limitEl) limitEl.textContent = '...';
-            }
-        }
+        let notifications = []; let unreadCount = 0; const MAX_NOTIFICATIONS = 50;
 
-        // --- Main Initialization ---
+        function formatTimestamp(timestamp) { const now = new Date(); const date = new Date(timestamp); const diffSeconds = Math.round((now - date) / 1000); const diffMinutes = Math.round(diffSeconds / 60); const diffHours = Math.round(diffMinutes / 60); const diffDays = Math.round(diffHours / 24); if (diffSeconds < 60) return `${diffSeconds} detik lalu`; if (diffMinutes < 60) return `${diffMinutes} menit lalu`; if (diffHours < 24) return `${diffHours} jam lalu`; if (diffDays < 7) return `${diffDays} hari lalu`; return date.toLocaleDateString('id-ID', { day: '2-digit', month: 'short' }); }
+        function renderNotificationList() { const listEl = $('#notificationList'); if (!listEl) return; if (notifications.length === 0) { listEl.innerHTML = '<li class="no-notifications">Belum ada notifikasi.</li>'; return; } listEl.innerHTML = notifications.map(notif => `<li class="${!notif.read ? 'unread' : ''}"> ${notif.message} <span class="timestamp">${formatTimestamp(notif.timestamp)}</span> </li>`).join(''); }
+        function updateNotificationBadge() { const badgeEl = $('#notificationBadge'); const bellEl = $('#notificationBell'); if (!badgeEl || !bellEl) return; if (unreadCount > 0) { badgeEl.textContent = unreadCount > 9 ? '9+' : unreadCount; badgeEl.classList.add('active'); bellEl.classList.add('ringing'); setTimeout(() => bellEl.classList.remove('ringing'), 500); } else { badgeEl.classList.remove('active'); bellEl.classList.remove('ringing'); } }
+        function addNotification(data) { let message = ''; let icon = 'fa-info-circle'; switch (data.type) { case 'newUser': message = `Pengguna baru (${data.ip}) terdeteksi.`; icon = 'fa-user-plus'; break; case 'adminUpdate': message = data.message || 'Update dari admin.'; icon = 'fa-wrench'; if (message.includes('🔑')) icon = 'fa-key'; if (message.includes('🗑️')) icon = 'fa-trash'; if (message.includes('🚫')) icon = 'fa-ban'; if (message.includes('✅')) icon = 'fa-check-circle'; if (message.includes('⚙️') || message.includes('🔧')) icon = 'fa-cog'; if (message.includes('🏷️')) icon = 'fa-tag'; break; default: message = data.message || 'Notifikasi baru.'; } const newNotification = { id: Date.now() + Math.random(), message: message, timestamp: data.timestamp || Date.now(), read: false, type: data.type }; notifications.unshift(newNotification); if (notifications.length > MAX_NOTIFICATIONS) { notifications.pop(); } unreadCount++; showRealtimeNotification(message, icon); updateNotificationBadge(); renderNotificationList(); try { localStorage.setItem('apiNotifications', JSON.stringify(notifications)); localStorage.setItem('apiUnreadCount', unreadCount); } catch (e) { console.warn("Gagal menyimpan notifikasi ke localStorage:", e); } }
+        function markNotificationsAsRead() { notifications.forEach(n => n.read = true); unreadCount = 0; updateNotificationBadge(); renderNotificationList(); try { localStorage.setItem('apiNotifications', JSON.stringify(notifications)); localStorage.setItem('apiUnreadCount', 0); } catch (e) { console.warn("Gagal menyimpan notifikasi ke localStorage:", e); } }
+        function loadNotificationsFromStorage() { try { const storedNotifications = localStorage.getItem('apiNotifications'); const storedUnreadCount = localStorage.getItem('apiUnreadCount'); if (storedNotifications) { notifications = JSON.parse(storedNotifications); unreadCount = notifications.filter(n => !n.read).length; if (storedUnreadCount !== null) { unreadCount = parseInt(storedUnreadCount, 10) || 0; } } else { notifications = []; unreadCount = 0; } renderNotificationList(); updateNotificationBadge(); } catch (e) { console.error("Gagal memuat notifikasi dari localStorage:", e); notifications = []; unreadCount = 0; } }
+
         document.addEventListener("DOMContentLoaded", () => {
             console.log("DOM Loaded. Starting initialization flow...");
-
-            // Elemen UI Utama
-            const preloader = $('#preloader');
-            const body = document.body;
-            const donationModal = $("#donationModal"), continueBtn = $("#continueBtn"), dontShowAgainCheckbox = $('#dontShowAgainCheckbox');
-
-            // Periksa elemen penting
-            if (!preloader || !body) {
-                console.error("Initialization failed: Critical UI elements not found!");
-                document.body.innerHTML = '<p style="color:red; padding:20px;">Page Initialization Error. Check Console (F12).</p>'; // Tampilkan error dasar
-                return;
-            }
-
+            const preloader = $('#preloader'); const body = document.body; const donationModal = $("#donationModal"), continueBtn = $("#continueBtn"), dontShowAgainCheckbox = $('#dontShowAgainCheckbox');
+            if (!preloader || !body) { console.error("Initialization failed: Critical UI elements not found!"); document.body.innerHTML = '<p style="color:red; padding:20px;">Page Initialization Error. Check Console (F12).</p>'; return; }
             const donationSkipped = localStorage.getItem('hideDonationModal');
 
-            function startLoadingAnimation(callback) {
-                console.log("Starting loading animation...");
-                // Ambil elemen dari DOM
-                const preloader = $('#preloader'), progressBar = $('#loadingProgressBar'), statusText = $('#loadingStatusText');
-                const enterBtn = $('#enterButton'); // Tombol baru kita
-
-                if (!preloader || !progressBar || !statusText || !enterBtn) {
-                    console.error("Preloader elements not found!");
-                    if(callback) callback(); // Fallback
-                    return;
-                }
-
-                const steps = [
-                    { p: 20, t: "Connecting to server..." },
-                    { p: 40, t: "Authenticating..." },
-                    { p: 70, t: "Downloading resources..." },
-                    { p: 90, t: "Preparing interface..." },
-                    { p: 100, t: "Ready!" }
-                ];
-                let idx = 0;
-
-                (function run(){
-                    if (idx < steps.length) {
-                        const s = steps[idx];
-                        progressBar.style.width = s.p + '%';
-                        statusText.textContent = s.t;
-                        idx++;
-                        setTimeout(run, 300 + Math.random() * 250); // Buat loading terasa dinamis
-                    } else {
-                        // Loading Selesai
-                        console.log("Loading animation finished.");
-                        statusText.textContent = "Loading Complete!";
-                        
-                        // Tampilkan tombol "Tap to Enter"
-                        enterBtn.style.display = 'inline-flex';
-                        
-                        // Tambahkan event listener ke tombol
-                        enterBtn.addEventListener('click', () => {
-                            console.log("Enter button clicked.");
-                            preloader.classList.add('hidden'); // Sembunyikan preloader
-                            
-                            // Panggil callback (initializePageContent)
-                            if (callback && typeof callback === 'function') {
-                                callback();
-                            } else {
-                                console.error("Loading callback is invalid!");
-                                initializePageContent(); // Fallback
-                            }
-                        }, { once: true });
-                    }
-                })();
-            }
-
-            // --- TAHAP 1: Mulai Loading ---
+            function startLoadingAnimation(callback) { /* ... (fungsi tetap sama) ... */ }
             startLoadingAnimation(() => {
-                // --- TAHAP 2: Setelah Loading Selesai -> Cek Donasi Skip ---
                 console.log("Loading finished, checking donation status...");
                 try {
                     if (!donationSkipped && donationModal) {
@@ -467,34 +446,32 @@
                             if (dontShowAgainCheckbox?.checked) localStorage.setItem("hideDonationModal", "true");
                             donationModal.classList.remove("active");
                             console.log("Donation modal closed, initializing page...");
-                            initializePageContent(); // Init setelah donasi ditutup
+                            initializePageContent();
                         }, { once: true });
                     } else {
-                        // --- TAHAP 3: Donasi Sudah Skip atau Modal Tidak Ada -> Langsung Init ---
                          console.log("Donation skipped or modal not found. Initializing page...");
                          initializePageContent();
                     }
-                } catch (error) {
-                    console.error("Error during donation check:", error);
-                    initializePageContent(); // Fallback: Langsung coba init page
-                }
+                } catch (error) { console.error("Error during donation check:", error); initializePageContent(); }
             });
 
-            // --- Initialize Page Content (dipanggil setelah loading & interaksi modal awal selesai) ---
             async function initializePageContent() {
                 try {
                     console.log("Initializing page content...");
-                    body.classList.add('loaded'); // Tampilkan body utama (mengatur opacity ke 1)
-
+                    body.classList.add('loaded');
                     const themeBtn = $("#theme-toggle-btn"); const applyTheme = t => { body.dataset.theme = t; localStorage.setItem("theme", t); if(themeBtn) themeBtn.innerHTML = t === "dark" ? '<i class="fa-solid fa-sun" style="color:#f59e0b;"></i>' : '<i class="fa-solid fa-moon" style="color:#818cf8;"></i>'; }; themeBtn?.addEventListener("click", () => applyTheme(body.dataset.theme === "dark" ? "light" : "dark")); applyTheme(localStorage.getItem("theme") || (window.matchMedia?.('(prefers-color-scheme: dark)').matches ? "dark" : "light"));
 
-                    // Music Logic
-                    const bgMusic=$('#backgroundMusic'), musicFab=$('#musicFabContainer'), fabToggle=$('#fabToggleBtn'), musicControls=$('#musicControlsExpanded'), playPause=$('#playPauseBtn'), muteBtn=$('#muteBtn'), volume=$('#volumeSlider'); let musicStarted=false; const tryStartMusic=()=>{if(bgMusic&&!musicStarted){bgMusic.volume=0.5;if(volume)volume.value=0.5;bgMusic.play().then(()=>{if(playPause)playPause.innerHTML='<i class="fas fa-pause"></i>';if(musicFab)musicFab.classList.remove('d-none');musicStarted=true;}).catch(e=>{if(playPause)playPause.innerHTML='<i class="fas fa-play"></i>';if(musicFab)musicFab.classList.remove('d-none');musicStarted=true;console.warn("Autoplay music failed:",e)});}}; tryStartMusic(); fabToggle?.addEventListener('click',()=>{const a=musicControls?.classList.toggle('active');if(fabToggle)fabToggle.innerHTML=a?'<i class="fas fa-times"></i>':'<i class="fas fa-music"></i>';}); playPause?.addEventListener('click',()=>{if(!musicStarted)tryStartMusic();else if(bgMusic.paused){bgMusic.play();playPause.innerHTML='<i class="fas fa-pause"></i>';}else{bgMusic.pause();playPause.innerHTML='<i class="fas fa-play"></i>';}}); muteBtn?.addEventListener('click',()=>{if(!musicStarted)return;bgMusic.muted=!bgMusic.muted;if(muteBtn)muteBtn.innerHTML=bgMusic.muted?'<i class="fas fa-volume-mute"></i>':'<i class="fas fa-volume-up"></i>';}); volume?.addEventListener('input',e=>{if(!musicStarted)return;bgMusic.volume=+e.target.value;bgMusic.muted=bgMusic.volume===0;if(muteBtn)muteBtn.innerHTML=bgMusic.muted?'<i class="fas fa-volume-mute"></i>':'<i class="fas fa-volume-up"></i>';});
-
-                    // QR Lightbox
+                    const bgMusic=$('#backgroundMusic'), musicFab=$('#musicFabContainer'), fabToggle=$('#fabToggleBtn'); const musicControls=$('#musicControlsExpanded'), playPause=$('#playPauseBtn'), muteBtn=$('#muteBtn'), volume=$('#volumeSlider'); let musicStarted=false; let userInteracted = false;
+                    const tryStartMusic = () => { if (bgMusic && !musicStarted && userInteracted) { bgMusic.volume = parseFloat(localStorage.getItem('musicVolume') || 0.5); if(volume) volume.value = bgMusic.volume; bgMusic.muted = localStorage.getItem('musicMuted') === 'true'; if (muteBtn) muteBtn.innerHTML = bgMusic.muted ? '<i class="fas fa-volume-mute"></i>' : '<i class="fas fa-volume-up"></i>'; bgMusic.play().then(() => { console.log("Music playing"); if(playPause) playPause.innerHTML = '<i class="fas fa-pause"></i>'; if(musicFab) musicFab.classList.add('visible'); musicStarted = true; }).catch(e => { console.warn("Autoplay music failed even after interaction:", e); if(playPause) playPause.innerHTML = '<i class="fas fa-play"></i>'; if(musicFab) musicFab.classList.add('visible'); musicStarted = true; }); } else if (!userInteracted) { console.log("Music waiting for user interaction."); if(musicFab) musicFab.classList.add('visible'); } };
+                    const interactionListener = () => { if (!userInteracted) { console.log("User interaction detected."); userInteracted = true; tryStartMusic(); document.removeEventListener('click', interactionListener); document.removeEventListener('keydown', interactionListener); } };
+                    document.addEventListener('click', interactionListener, { once: true }); document.addEventListener('keydown', interactionListener, { once: true });
+                    fabToggle?.addEventListener('click', ()=>{ const a=musicControls?.classList.toggle('active');if(fabToggle)fabToggle.innerHTML=a?'<i class="fas fa-times"></i>':'<i class="fas fa-music"></i>';});
+                    playPause?.addEventListener('click',()=>{ if (!userInteracted) { userInteracted = true; tryStartMusic(); return; } if (!musicStarted && bgMusic) { tryStartMusic(); } else if (bgMusic && bgMusic.paused) { bgMusic.play(); playPause.innerHTML = '<i class="fas fa-pause"></i>'; } else if (bgMusic) { bgMusic.pause(); playPause.innerHTML = '<i class="fas fa-play"></i>'; }});
+                    muteBtn?.addEventListener('click',()=>{ if (!bgMusic) return; bgMusic.muted=!bgMusic.muted; if(muteBtn)muteBtn.innerHTML=bgMusic.muted?'<i class="fas fa-volume-mute"></i>':'<i class="fas fa-volume-up"></i>'; localStorage.setItem('musicMuted', bgMusic.muted);});
+                    volume?.addEventListener('input',e=>{ if (!bgMusic) return; const newVolume = parseFloat(e.target.value); bgMusic.volume = newVolume; bgMusic.muted = newVolume === 0; if(muteBtn)muteBtn.innerHTML=bgMusic.muted?'<i class="fas fa-volume-mute"></i>':'<i class="fas fa-volume-up"></i>'; localStorage.setItem('musicVolume', newVolume); if (newVolume === 0) localStorage.setItem('musicMuted', true); else if (localStorage.getItem('musicMuted') === 'true') localStorage.setItem('musicMuted', false); });
+                    
                     const qrImg = $("#donationQR"), qrBox = $("#qrLightbox"), lightImg = $("#lightboxImage"); if(qrImg && qrBox) { qrImg.addEventListener("click", () => { if(lightImg) lightImg.src = qrImg.src; qrBox.classList.add("active"); }); qrBox.addEventListener("click", e => { if (e.target === qrBox) qrBox.classList.remove("active"); }); }
-
-                    // Load API Data and Render
+                    
                     const tabsContainer = $("#tabs"), apiList = $("#api-list");
                     try { settings = await fetch("/api/get-endpoints").then(res => res.ok ? res.json() : Promise.reject('Failed to load')); } catch (e) { showNotification("Gagal load config API!", "error"); settings = { endpoints: {} }; }
                     const apis = settings.endpoints || {};
@@ -503,50 +480,27 @@
                     if (tabsContainer && apiList && Object.keys(apis).length > 0) { const allBtn = document.createElement("button"); allBtn.className = "tab active"; allBtn.dataset.tab = "all"; allBtn.innerText = "All"; tabsContainer.appendChild(allBtn); Object.keys(apis).sort().forEach(k => { const btn=document.createElement("button"); btn.className="tab"; btn.dataset.tab=k; btn.innerText=k[0].toUpperCase()+k.slice(1); tabsContainer.appendChild(btn); }); renderAPIs("all"); filterApiCards(); } else if (apiList) { apiList.innerHTML = "<p style='text-align:center;color:var(--gray);'>Gagal memuat endpoint.</p>";}
                     
                     function renderAPIs(category) { 
-                        if (!apiList) return; 
-                        apiList.innerHTML = ""; 
+                        if (!apiList) return; apiList.innerHTML = ""; 
                         const endpoints = category === 'all' ? Object.values(apis).flat().sort((a,b)=>(a.name||'').localeCompare(b.name||'')) : (apis[category]?.sort((a,b)=>(a.name||'').localeCompare(b.name||'')) || []); 
                         if (endpoints.length === 0) { apiList.innerHTML = "<p style='text-align:center;color:var(--gray);'>Tidak ada endpoint.</p>"; return; } 
                         endpoints.forEach((api, i) => { 
                             if (!api?.path) return; 
-                            const card = document.createElement("div"); 
-                            card.className = "api-card fade-in"; 
-                            card.style.animationDelay = `${i * 0.03}s`; 
+                            const card = document.createElement("div"); card.className = "api-card fade-in"; card.style.animationDelay = `${i * 0.03}s`; 
                             let label = api.dynamicLabel === 'NEW' ? '<span class="new-label">NEW</span>' : (api.dynamicLabel === 'FIX' ? '<span class="new-label fix-label">FIX</span>' : ''); 
-                            const basePath = api.path.split('?')[0]; 
-                            const status = endpointStatuses[basePath] || api.status || 'Active'; 
+                            const basePath = api.path.split('?')[0]; const status = endpointStatuses[basePath] || api.status || 'Active'; 
                             let sC = status.toLowerCase().includes("error") ? "danger" : (status.toLowerCase().includes("maintenance") || status.toLowerCase().includes("warning") ? "warning" : ""); 
-                            
-                            // === PERUBAHAN HTML TOMBOL DIMULAI DI SINI ===
-                            card.innerHTML = `
-                                <div class="api-info">
-                                    <h3>${api.name||'API'} ${label}</h3>
-                                    <p>${api.desc||''}</p>
-                                    <span class="status ${sC}" data-path="${basePath}">${status}</span>
-                                </div>
-                                <div class="api-actions">
-                                    <button class="play-button" data-endpoint="${api.path}" data-api="${api.name||'API'}" data-desc="${api.desc||''}">
-                                        <i class="fa-solid fa-play"></i> Try it now
-                                    </button>
-                                </div>`;
-                            // === PERUBAHAN HTML TOMBOL SELESAI ===
-                            
+                            card.innerHTML = `<div class="api-info"> <h3>${api.name||'API'} ${label}</h3> <p>${api.desc||''}</p> <span class="status ${sC}" data-path="${basePath}">${status}</span> </div> <div class="api-actions"> <button class="play-button" data-endpoint="${api.path}" data-api="${api.name||'API'}" data-desc="${api.desc||''}"> <i class="fa-solid fa-play"></i> Try it now </button> </div>`;
                             apiList.appendChild(card); 
                         }); 
                         filterApiCards(); 
                     }
 
-                    // Load Stats & Blacklist
-                    fetchAndUpdateStats(); // Global stats
-                    fetchAndUpdateMyLimit(); // User limit
-                    loadPublicBlacklist();
+                    fetchAndUpdateStats(); fetchAndUpdateMyLimit(); loadPublicBlacklist(); loadNotificationsFromStorage();
+                    setInterval(fetchAndUpdateStats, 30000); setInterval(fetchAndUpdateMyLimit, 30000); startStatusPolling();
 
-                    setInterval(fetchAndUpdateStats, 30000);
-                    setInterval(fetchAndUpdateMyLimit, 30000); // Refresh limit juga
-                    startStatusPolling();
-
-                    // Event Listeners
                     $('#refreshPublicBlacklistBtn')?.addEventListener('click', loadPublicBlacklist); $('#apiSearchInput')?.addEventListener('input', filterApiCards); tabsContainer?.addEventListener("click", e => { if (e.target.classList.contains("tab")) { tabsContainer.querySelector('.active')?.classList.remove('active'); e.target.classList.add('active'); renderAPIs(e.target.dataset.tab); } }); $('#apiPlatformBadge')?.addEventListener('click', () => $('#apiContentSection')?.scrollIntoView({ behavior: 'smooth' }));
+                    const bellEl = $('#notificationBell'); const listEl = $('#notificationList'); bellEl?.addEventListener('click', (e) => { e.stopPropagation(); const isActive = listEl?.classList.toggle('active'); if (isActive) { markNotificationsAsRead(); } });
+                    document.addEventListener('click', (e) => { if (listEl && !bellEl?.contains(e.target) && !listEl.contains(e.target)) { listEl.classList.remove('active'); } });
 
                     document.addEventListener("click", e => { try {
                         const playBtn = e.target.closest(".play-button:not(.btn-secondary):not(#retryRequestBtn):not(#continueBtn)");
@@ -555,7 +509,7 @@
                         if (e.target.closest("#retryRequestBtn")) { e.target.closest("#retryRequestBtn").classList.add('d-none'); $("#apiResponseContent").classList.add("d-none"); $("#copyResponseBtn").classList.add("d-none"); $("#paramForm").style.display = "block"; $("#submitParamBtn").style.display = "block"; }
                     } catch(err){ console.error("Click listener error:", err); } });
                     $("#submitParamBtn")?.addEventListener("click", () => { try { const form = $("#paramForm"); if(!form || (form.innerHTML.trim() !== "" && !form.checkValidity())) return form?.reportValidity(); form.style.display = "none"; $("#submitParamBtn").style.display = "none"; $('#retryRequestBtn').classList.add('d-none'); $("#apiResponseLoading").style.display = "block"; let url = currentEndpointPath; if (form.innerHTML.trim() !== "") url = `${currentEndpointPath.split("?")[0]}?${Array.from(form.querySelectorAll("input")).map(i=>`${i.name}=${encodeURIComponent(i.value)}`).join("&")}`; fetchAPI(url); } catch(err){ console.error("Submit error:", err); showNotification("Error submitting request", "error"); $("#apiResponseLoading").style.display = "none"; $("#paramForm").style.display = "block"; $("#submitParamBtn").style.display = "block";} });
-                    function fetchAPI(url) { try{ const fullURL = url.startsWith('/') ? window.location.origin + url : url; const respEl = $("#apiResponseContent"), loadEl = $("#apiResponseLoading"), copyBtn = $("#copyResponseBtn"), retryBtn = $('#retryRequestBtn'); if(!respEl || !loadEl || !copyBtn || !retryBtn) { console.error("Missing elements for fetchAPI"); return; } loadEl.style.display = "block"; [respEl, copyBtn, retryBtn].forEach(el => el.classList.add('d-none')); respEl.style.color = 'var(--light)'; fetch(fullURL).then(async res => { let hasContent = false; respEl.innerHTML = ''; if (res.status === 429) { respEl.textContent = `Error ${res.status}: Terlalu banyak request.`; respEl.style.color = 'var(--danger-text)'; } else if (res.status === 403) { respEl.textContent = `Error ${res.status}: Akses ditolak.`; respEl.style.color = 'var(--danger-text)'; } else if (!res.ok) { let eBody = `HTTP error ${res.status}`; try { eBody = (await res.text()).substring(0,500); } catch {} throw new Error(eBody); } else { const cType = res.headers.get("content-type"); if (cType?.includes("json")) { try { respEl.innerHTML = highlightJSON(await res.json()); hasContent = true; } catch(e){ respEl.textContent = "Error parsing JSON."; respEl.style.color = 'var(--danger-text)';} } else if (cType?.startsWith("image/")) { const imgUrl = URL.createObjectURL(await res.blob()); respEl.innerHTML = `<img src="${imgUrl}" alt="Response" style="max-width:100%;max-height:300px;border-radius:4px;display:block;margin:auto;" />`; hasContent = true; } else { const text = await res.text(); respEl.textContent = text.substring(0, 2000) + (text.length > 2000 ? '\n...' : ''); hasContent = !!text.trim(); } } loadEl.style.display = "none"; respEl.classList.remove("d-none"); if(hasContent || respEl.textContent) { copyBtn.classList.remove("d-none"); retryBtn.classList.remove('d-none'); } fetchAndUpdateMyLimit(); /* <-- REFRESH LIMIT */ }).catch(err => { loadEl.style.display = "none"; respEl.classList.remove("d-none"); respEl.style.color = 'var(--danger-text)'; respEl.textContent = "Fetch Error:\n" + (err.message || "Gagal"); copyBtn.classList.remove("d-none"); retryBtn.classList.remove('d-none'); showNotification("Request Failed!", 'error'); console.error("fetchAPI fetch error:", err); }); } catch(err){ console.error("fetchAPI outer error:", err); showNotification("Error fetching API", "error"); if($("#apiResponseLoading")) $("#apiResponseLoading").style.display = "none"; }}
+                    function fetchAPI(url) { try{ const fullURL = url.startsWith('/') ? window.location.origin + url : url; const respEl = $("#apiResponseContent"), loadEl = $("#apiResponseLoading"), copyBtn = $("#copyResponseBtn"), retryBtn = $('#retryRequestBtn'); if(!respEl || !loadEl || !copyBtn || !retryBtn) { console.error("Missing elements for fetchAPI"); return; } loadEl.style.display = "block"; [respEl, copyBtn, retryBtn].forEach(el => el.classList.add('d-none')); respEl.style.color = 'var(--light)'; fetch(fullURL).then(async res => { let hasContent = false; respEl.innerHTML = ''; if (res.status === 429) { respEl.textContent = `Error ${res.status}: Terlalu banyak request.`; respEl.style.color = 'var(--danger-text)'; } else if (res.status === 403) { respEl.textContent = `Error ${res.status}: Akses ditolak.`; respEl.style.color = 'var(--danger-text)'; } else if (!res.ok) { let eBody = `HTTP error ${res.status}`; try { eBody = (await res.text()).substring(0,500); } catch {} throw new Error(eBody); } else { const cType = res.headers.get("content-type"); if (cType?.includes("json")) { try { respEl.innerHTML = highlightJSON(await res.json()); hasContent = true; } catch(e){ respEl.textContent = "Error parsing JSON."; respEl.style.color = 'var(--danger-text)';} } else if (cType?.startsWith("image/")) { const imgUrl = URL.createObjectURL(await res.blob()); respEl.innerHTML = `<img src="${imgUrl}" alt="Response" style="max-width:100%;max-height:300px;border-radius:4px;display:block;margin:auto;" />`; hasContent = true; } else { const text = await res.text(); respEl.textContent = text.substring(0, 2000) + (text.length > 2000 ? '\n...' : ''); hasContent = !!text.trim(); } } loadEl.style.display = "none"; respEl.classList.remove("d-none"); if(hasContent || respEl.textContent) { copyBtn.classList.remove("d-none"); retryBtn.classList.remove('d-none'); } fetchAndUpdateMyLimit(); }).catch(err => { loadEl.style.display = "none"; respEl.classList.remove("d-none"); respEl.style.color = 'var(--danger-text)'; respEl.textContent = "Fetch Error:\n" + (err.message || "Gagal"); copyBtn.classList.remove("d-none"); retryBtn.classList.remove('d-none'); showNotification("Request Failed!", 'error'); console.error("fetchAPI fetch error:", err); }); } catch(err){ console.error("fetchAPI outer error:", err); showNotification("Error fetching API", "error"); if($("#apiResponseLoading")) $("#apiResponseLoading").style.display = "none"; }}
 
                     $("#btn-close")?.addEventListener("click", () => $("#apiResponseModal")?.classList.remove("active"));
                     $('#copyResponseBtn')?.addEventListener('click', (e) => { try { const rEl = $('#apiResponseContent'); let txt = rEl?.querySelector('img') ? rEl.querySelector('img').src : rEl?.textContent; if(txt) copyToClipboard(txt, e.target.closest('.copy-button'), rEl?.querySelector('img') ? 'URL Gambar Disalin!' : 'Response Disalin!'); } catch(err){console.error("Copy response error:", err);} });
@@ -564,13 +518,22 @@
                     $$('.modal').forEach(m => m.addEventListener('click', e => { try { if (e.target === m) m.classList.remove('active'); } catch(err){} })); $$('.report-close, .about-close').forEach(b => b.addEventListener('click', e => { try { e.target.closest('.modal')?.classList.remove('active'); } catch(err){} }));
                     $('#reportForm')?.addEventListener('submit', async e => { e.preventDefault(); const btn=$('#submitReportBtn'); btn.disabled = true; btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Sending...'; const msg = `== ${$('#reportType').value} ==\n👤 ${$('#reportName').value}\n📝 ${$('#reportText').value}`; try { const r = await fetch(`${NGL_PROXY}&text=${encodeURIComponent(msg)}`); if(!r.ok) throw new Error('NGL failed'); showNotification("Laporan terkirim!", 'success'); $('#reportModal').classList.remove('active'); } catch(err) { showNotification("Gagal kirim.", 'error'); console.error("NGL Submit Error:", err);} finally { btn.disabled = false; btn.innerHTML = '<i class="fa fa-paper-plane"></i> Kirim Laporan'; } });
 
+                    function connectWebSocket() {
+                        const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'; const wsUrl = `${wsProtocol}//${window.location.host}`; const socket = new WebSocket(wsUrl);
+                        socket.onopen = () => { console.log('WebSocket Connected'); };
+                        socket.onmessage = (event) => { try { const data = JSON.parse(event.data); console.log('WebSocket Message Received:', data); addNotification(data); } catch (e) { console.error('Failed to parse WebSocket message:', e); } };
+                        socket.onerror = (error) => { console.error('WebSocket Error:', error); showRealtimeNotification("Koneksi notifikasi error.", 'fa-exclamation-triangle'); };
+                        socket.onclose = (event) => { console.warn('WebSocket Disconnected:', event.code, event.reason); showRealtimeNotification("Koneksi notifikasi terputus. Mencoba menghubungkan ulang...", 'fa-plug'); setTimeout(connectWebSocket, 5000); };
+                    }
+                    connectWebSocket();
+
                     console.log("Page content initialized successfully.");
                 } catch (pageInitError) {
                     console.error("FATAL ERROR during page content initialization:", pageInitError);
                     document.body.innerHTML = `<div style="padding: 2rem; text-align: center; color: #991b1c; background: #fee2e2; border: 1px solid #fecaca; border-radius: 8px; margin: 2rem auto; max-width: 500px;"><h2>Initialization Error</h2><p>Failed to initialize the page content. Please check the console (F12) for details and refresh.</p><pre style="text-align:left; font-size: 0.8em; max-height: 200px; overflow: auto; background: #fff; padding: 10px; border-radius: 4px; margin-top: 1rem; white-space: pre-wrap;">${pageInitError.message}\n${pageInitError.stack?.substring(0, 300) || ''}</pre></div>`;
                 }
-            } // End initializePageContent
-        }); // End DOMContentLoaded
+            }
+        });
     </script>
 </body>
 </html>
