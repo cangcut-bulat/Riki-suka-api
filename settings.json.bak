@@ -54,7 +54,7 @@
       {
         "name": "Cek Status",
         "desc": "Cek status payment (belum implementasi)",
-        "status": "Warning",
+        "status": "Warning", // Ganti status karena belum implementasi
         "path": "/orderkuota/cekstatus?apikey=&merchant=&keyorkut="
       }
   ],
