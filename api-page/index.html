@@ -11,10 +11,9 @@
     <link rel="preload" href="/images/background.jpg" as="image">
     <link rel="preload" href="/icon.png" as="image">
     <style>
-        /* CSS Lengkap dari versi sebelumnya ada di sini */
         :root {
             --primary: #6366f1; --primary-dark: #4f46e5; --primary-light: #818cf8; --secondary: #f472b6;
-            --dark: #f8fafc; --darker: #e2e8f0; --light: #0f172a; --gray: #475569;
+            --dark: #f8fafc; --darker: #e2e8f0; --light: #0f172a; --gray: #475569; --gray-light: #94a3b8;
             --success: #10b981; --warning: #f59e0b; --danger: #ef4444;
             --success-bg: #dcfce7; --warning-bg: #fef3c7; --danger-bg: #fee2e2;
             --success-text: #065f46; --warning-text: #92400e; --danger-text: #991b1b;
@@ -24,87 +23,47 @@
             --header-height: 4rem;
             --loader-bg-light: rgba(240, 242, 245, 0.95); --loader-bg-dark: rgba(15, 23, 42, 0.98);
             --loader-progress-bg: rgba(99, 102, 241, 0.3); --loader-progress-fill: #6366f1;
+            --notif-badge-bg: var(--danger);
+            /* [MODIFIKASI] Jarak antar FAB */
+            --fab-spacing: 1rem;
+            --fab-size: 56px;
         }
         body[data-theme="dark"] {
-            --dark: #000000; --darker: #000000; --light: #f8fafc; --gray: #94a3b8;
+            --dark: #000000; --darker: #000000; --light: #f8fafc; --gray: #94a3b8; --gray-light: #64748b;
             --success-bg: #052e16; --warning-bg: #422006; --danger-bg: #450a0a;
             --success-text: #6ee7b7; --warning-text: #fcd34d; --danger-text: #fca5a5;
             --card-bg: rgba(255, 255, 255, 0.05); --card-hover: rgba(255, 255, 255, 0.08); --border-color: rgba(255, 255, 255, 0.1);
             --input-bg: rgba(255, 255, 255, 0.05); --input-border: rgba(255, 255, 255, 0.2); --input-focus-bg: rgba(255, 255, 255, 0.1); --input-focus-border: var(--primary-light);
             --pre-bg: rgba(0, 0, 0, 0.3); --pre-border: rgba(255, 255, 255, 0.1);
+            --notif-badge-bg: #f87171;
         }
         html { scroll-behavior: smooth; font-size: 16px; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
-            background-image: url('/images/background.jpg'); 
-            background-size: cover; background-position: center center; background-attachment: fixed; background-repeat: no-repeat; 
-            color: var(--light); 
-            padding: calc(var(--header-height) + 1rem) 1rem 1rem 1rem; 
-            min-height: 100vh; line-height: 1.6; 
-            transition: background 0.3s ease, color 0.3s ease, opacity 0.5s ease-in; 
-            position: relative; z-index: 1; 
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-image: url('/images/background.jpg');
+            background-size: cover; background-position: center center; background-attachment: fixed; background-repeat: no-repeat;
+            color: var(--light);
+            padding: calc(var(--header-height) + 1rem) 1rem 1rem 1rem;
+            min-height: 100vh; line-height: 1.6;
+            transition: background 0.3s ease, color 0.3s ease, opacity 0.5s ease-in;
+            position: relative; z-index: 1;
         }
-        
-        header.top-navbar,
-        div.container,
-        footer.footer,
-        #musicFabContainer {
+        /* [MODIFIKASI] Opacity juga diterapkan ke clock FAB */
+        header.top-navbar, div.container, footer.footer, #musicFabContainer, #clockFabContainer {
             opacity: 0;
             transition: opacity 0.5s ease-in;
         }
-        
-        body.loaded header.top-navbar,
-        body.loaded div.container,
-        body.loaded footer.footer,
-        body.loaded #musicFabContainer {
+        body.loaded header.top-navbar, body.loaded div.container, body.loaded footer.footer, body.loaded #musicFabContainer, body.loaded #clockFabContainer {
             opacity: 1;
         }
-
         body::before { content: ''; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(255, 255, 255, 0.7); z-index: -1; transition: background-color 0.3s ease; backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); }
         body[data-theme="dark"] { background-image: none; background: linear-gradient(135deg, var(--darker), var(--dark)); }
         body[data-theme="dark"]::before { background-color: rgba(0, 0, 0, 0); backdrop-filter: none; -webkit-backdrop-filter: none; }
         .d-none { display: none !important; }
 
-        /* --- [BARU] Notifikasi iOS Style --- */
-        #realtimeNotification {
-            position: fixed; top: 0; left: 50%;
-            margin-top: 10px; padding: 12px 20px;
-            border-radius: 25px; /* Lebih rounded */
-            font-weight: 500; color: var(--gray-700);
-            background-color: rgba(255, 255, 255, 0.9);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
-            transform: translateY(-150%) translateX(-50%);
-            transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-            z-index: 1050; /* Di atas modal */
-            display: flex; align-items: center; gap: 10px;
-            max-width: calc(100% - 40px);
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            font-size: 0.9rem;
-        }
-        #realtimeNotification.show { transform: translateY(0) translateX(-50%); }
-        #realtimeNotification i { color: var(--primary); font-size: 1.1rem; }
-
-        /* --- [BARU] Bell Notifikasi --- */
-        .notification-bell-container { position: relative; margin-left: 1rem; }
-        #notificationBell { background: transparent; border: none; color: var(--gray); width: 44px; height: 44px; border-radius: 50%; font-size: 1.25rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: var(--transition); }
-        #notificationBell:hover { background: var(--card-hover); color: var(--primary); }
-        #notificationBadge { position: absolute; top: 5px; right: 5px; background-color: var(--danger); color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 0.7rem; font-weight: bold; display: flex; align-items: center; justify-content: center; line-height: 1; pointer-events: none; opacity: 0; transform: scale(0.5); transition: opacity 0.2s ease, transform 0.2s ease; }
-        #notificationBadge.active { opacity: 1; transform: scale(1); }
-        #notificationBell.ringing { animation: ring-animation 0.5s ease-in-out; }
-        @keyframes ring-animation { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(15deg); } 75% { transform: rotate(-15deg); } }
-        #notificationList { position: absolute; top: calc(100% + 10px); right: 0; width: 300px; max-height: 400px; overflow-y: auto; background: var(--card-bg); border-radius: 8px; box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2); border: 1px solid var(--border-color); z-index: 1000; list-style: none; padding: 0.5rem 0; display: none; opacity: 0; transform: translateY(10px); transition: opacity 0.3s ease, transform 0.3s ease; }
-        #notificationList.active { display: block; opacity: 1; transform: translateY(0); }
-        #notificationList li { padding: 0.75rem 1rem; border-bottom: 1px solid var(--border-color); font-size: 0.85rem; color: var(--gray); cursor: default; }
-        #notificationList li:last-child { border-bottom: none; }
-        #notificationList li.unread { font-weight: 600; color: var(--light); background-color: rgba(99, 102, 241, 0.05); }
-        body[data-theme="dark"] #notificationList li.unread { background-color: rgba(99, 102, 241, 0.1); }
-        #notificationList .timestamp { display: block; font-size: 0.75rem; color: var(--gray-500); margin-top: 4px; opacity: 0.8; }
-        #notificationList .no-notifications { padding: 1.5rem; text-align: center; color: var(--gray-500); font-style: italic; }
-
+        /* Preloader */
         #preloader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--loader-bg-light); background-image: url('/images/background.jpg'); background-size: cover; background-position: center center; z-index: 9999; display: flex; align-items: center; justify-content: center; opacity: 1; transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), visibility 0s 0.8s; visibility: visible; backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); }
         body[data-theme="dark"] #preloader { background-color: var(--loader-bg-dark); background-image: none; background: linear-gradient(135deg, #0f172a, #1e293b); }
         #preloader.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
@@ -117,6 +76,7 @@
         @keyframes subtlePulse { 0%, 100% { transform: scale(1); opacity: 0.9; } 50% { transform: scale(1.05); opacity: 1; } }
         @keyframes scaleUpFadeIn { to { transform: scale(1); opacity: 1; } }
 
+        /* Modals, Layout, Card, Form Styles */
         pre, #apiResponseContent { white-space: pre-wrap; word-wrap: break-word; overflow-x: auto; background: var(--pre-bg); color: var(--light); padding: 1rem; border-radius: 8px; max-height: 400px; font-size: 0.875rem; font-family: 'Consolas', 'Menlo', 'Courier New', monospace; border: 1px solid var(--pre-border); box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); font-weight: 600; line-height: 1.6; }
         .json-key { color: #c991e1; font-weight: 700; } .json-string { color: #86c166; } .json-number { color: #f59e0b; } .json-boolean { color: #6366f1; font-weight: 700; } .json-null { color: var(--gray); font-style: italic; }
         .modal-body form label { display: block; font-weight: 500; margin-bottom: 6px; color: var(--gray); font-size: 0.9rem; }
@@ -126,216 +86,127 @@
         .modal-body form input:focus, .modal-body form textarea:focus { outline: none; border-color: var(--input-focus-border); background: var(--input-focus-bg); box-shadow: 0 0 0 3px var(--input-focus-shadow); }
         #submitParamBtn, #submitReportBtn { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; border: none; padding: 12px 24px; font-size: 0.95rem; border-radius: 8px; cursor: pointer; font-weight: 500; transition: var(--transition); width: 100%; margin-top: 0.5rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
         #submitParamBtn:hover, #submitReportBtn:hover { background: linear-gradient(135deg, var(--primary-dark), var(--primary)); transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); }
-        .loading-spinner { margin: 1rem auto; border: 3px solid var(--card-bg); border-top: 3px solid var(--primary-light); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .modal { position: fixed; top: 0; left: 0; z-index: 100; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.7); display: flex; align-items: center; justify-content: center; padding: 1rem; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
-        .modal.active { opacity: 1; pointer-events: all; }
-        .modal-dialog { width: 100%; max-width: 500px; background: var(--card-bg); /* Use card bg */ border-radius: 12px; padding: 1.5rem; color: var(--light); overflow: auto; max-height: 90vh; transform: translateY(20px); transition: transform 0.3s ease, opacity 0.3s ease, background 0.3s ease; opacity: 0; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); border: 1px solid var(--border-color); }
-        body[data-theme="dark"] .modal-dialog { background: var(--darker); } /* Darker background in dark mode */
-        .modal.active .modal-dialog { transform: translateY(0); opacity: 1; }
+        .loading-spinner { margin: 1rem auto; border: 3px solid var(--card-bg); border-top: 3px solid var(--primary-light); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; } @keyframes spin { to { transform: rotate(360deg); } }
+        .modal { position: fixed; top: 0; left: 0; z-index: 100; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.7); display: flex; align-items: center; justify-content: center; padding: 1rem; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; } .modal.active { opacity: 1; pointer-events: all; }
+        .modal-dialog { width: 100%; max-width: 500px; background: var(--card-bg); border-radius: 12px; padding: 1.5rem; color: var(--light); overflow: auto; max-height: 90vh; transform: translateY(20px); transition: transform 0.3s ease, opacity 0.3s ease, background 0.3s ease; opacity: 0; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); border: 1px solid var(--border-color); }
+        body[data-theme="dark"] .modal-dialog { background: var(--darker); } .modal.active .modal-dialog { transform: translateY(0); opacity: 1; }
         .modal-header { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 1rem; border-bottom: 1px solid var(--border-color); margin-bottom: 1rem; }
         .modal-header h5 { font-size: 1.25rem; font-weight: 600; } .modal-header span { font-size: 0.9rem; color: var(--gray); display: block; margin-top: 4px; }
-        .btn-close { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--gray); transition: var(--transition); padding: 0.25rem; border-radius: 4px; }
-        .btn-close:hover { color: var(--light); background: var(--card-hover); }
+        .btn-close { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--gray); transition: var(--transition); padding: 0.25rem; border-radius: 4px; } .btn-close:hover { color: var(--light); background: var(--card-hover); }
         .modal-body { padding: 0.5rem 0; }
-        .copy-section { display: none; justify-content: space-between; align-items: center; background-color: var(--pre-bg); border: 1px solid var(--pre-border); padding: 10px 14px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 1rem; overflow: hidden; }
-        .copy-section span { color: var(--gray); word-break: break-all; margin-right: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .copy-section.active { display: flex; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .copy-button { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); border: none; color: white; padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 4px; font-weight: 500; flex-shrink: 0; }
-        .copy-button:hover { background: linear-gradient(135deg, var(--primary-dark), var(--primary)); transform: translateY(-1px); }
+        .copy-section { display: none; justify-content: space-between; align-items: center; background-color: var(--pre-bg); border: 1px solid var(--pre-border); padding: 10px 14px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 1rem; overflow: hidden; } .copy-section span { color: var(--gray); word-break: break-all; margin-right: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .copy-section.active { display: flex; animation: fadeIn 0.3s ease; } @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .copy-button { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); border: none; color: white; padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 4px; font-weight: 500; flex-shrink: 0; } .copy-button:hover { background: linear-gradient(135deg, var(--primary-dark), var(--primary)); transform: translateY(-1px); }
         #copyResponseBtn { margin: 0.75rem 0 0; width: auto; padding: 6px 12px; font-size: 0.8rem; margin-left: auto; display: flex; }
-        #retryRequestBtn { background: var(--card-hover); color: var(--primary); border: 1px solid var(--primary-light); box-shadow: none; margin-top: 1rem; width: 100%; justify-content: center; }
-        #retryRequestBtn:hover { background: var(--primary-light); color: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2); }
+        #retryRequestBtn { background: var(--card-hover); color: var(--primary); border: 1px solid var(--primary-light); box-shadow: none; margin-top: 1rem; width: 100%; justify-content: center; } #retryRequestBtn:hover { background: var(--primary-light); color: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2); }
         body[data-theme="dark"] #retryRequestBtn { color: var(--primary-light); border-color: var(--primary); } body[data-theme="dark"] #retryRequestBtn:hover { background: var(--primary); color: white; }
         .container { max-width: 1200px; margin: 0 auto; padding: 0; }
-        .hero { text-align: center; margin: 1.5rem auto 2rem auto; max-width: 800px; padding: 0 1rem; }
-        .api-platform-badge { display: inline-flex; align-items: center; gap: 0.5rem; background-color: var(--card-bg); color: var(--primary); padding: 0.4rem 0.9rem; border-radius: 20px; font-size: 0.9rem; font-weight: 500; border: 1px solid var(--border-color); margin-bottom: 1rem; transition: var(--transition); cursor: pointer; }
-        body[data-theme="dark"] .api-platform-badge { color: var(--primary-light); }
-        .api-platform-badge:hover { background-color: var(--card-hover); box-shadow: 0 4px 8px rgba(0,0,0,0.1); transform: translateY(-2px); }
-        .hero h2 { font-size: 2.5rem; font-weight: 700; color: var(--primary); margin-bottom: 0.5rem; }
-        body[data-theme="dark"] .hero h2 { background: linear-gradient(90deg, #a5b4fc, #818cf8, #6366f1, #818cf8, #a5b4fc); background-size: 300% 300%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: gradient 8s ease infinite; }
-        @keyframes gradient { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-        .hero p { font-size: 1.1rem; color: var(--gray); margin-bottom: 1.5rem; line-height: 1.6; max-width: 600px; margin-left: auto; margin-right: auto; }
-        .version-label { font-size: 0.8rem; font-weight: 500; color: var(--primary); background-color: var(--card-bg); padding: 3px 8px; border-radius: 6px; margin-left: 0.5rem; vertical-align: middle; border: 1px solid var(--border-color); }
-        body[data-theme="dark"] .version-label { color: var(--primary-light); }
-        .top-navbar { position: fixed; top: 0; left: 0; width: 100%; height: var(--header-height); background: var(--darker); box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: space-between; padding: 0 1rem 0 1.5rem; z-index: 50; transition: background 0.3s ease; }
-        .navbar-logo img { height: 32px; width: 32px; border-radius: 4px; }
-        .navbar-scrolling-text-wrapper { flex-grow: 1; overflow: hidden; margin: 0 1.5rem; }
-        .scrolling-text-container { width: 100%; overflow: hidden; white-space: nowrap; }
+        .hero { text-align: center; margin: 1.5rem auto 2rem auto; max-width: 800px; padding: 0 1rem; } .api-platform-badge { display: inline-flex; align-items: center; gap: 0.5rem; background-color: var(--card-bg); color: var(--primary); padding: 0.4rem 0.9rem; border-radius: 20px; font-size: 0.9rem; font-weight: 500; border: 1px solid var(--border-color); margin-bottom: 1rem; transition: var(--transition); cursor: pointer; } body[data-theme="dark"] .api-platform-badge { color: var(--primary-light); }
+        .api-platform-badge:hover { background-color: var(--card-hover); box-shadow: 0 4px 8px rgba(0,0,0,0.1); transform: translateY(-2px); } .hero h2 { font-size: 2.5rem; font-weight: 700; color: var(--primary); margin-bottom: 0.5rem; } body[data-theme="dark"] .hero h2 { background: linear-gradient(90deg, #a5b4fc, #818cf8, #6366f1, #818cf8, #a5b4fc); background-size: 300% 300%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: gradient 8s ease infinite; } @keyframes gradient { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        .hero p { font-size: 1.1rem; color: var(--gray); margin-bottom: 1.5rem; line-height: 1.6; max-width: 600px; margin-left: auto; margin-right: auto; } .version-label { font-size: 0.8rem; font-weight: 500; color: var(--primary); background-color: var(--card-bg); padding: 3px 8px; border-radius: 6px; margin-left: 0.5rem; vertical-align: middle; border: 1px solid var(--border-color); } body[data-theme="dark"] .version-label { color: var(--primary-light); }
+        .top-navbar { position: fixed; top: 0; left: 0; width: 100%; height: var(--header-height); background: var(--darker); box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: space-between; padding: 0 1.5rem; z-index: 50; transition: background 0.3s ease; } .navbar-logo img { height: 32px; width: 32px; border-radius: 4px; }
+        .navbar-scrolling-text-wrapper { flex-grow: 1; overflow: hidden; margin: 0 1.5rem; } .scrolling-text-container { width: 100%; overflow: hidden; white-space: nowrap; }
         .scrolling-text { display: inline-block; padding-left: 100%; animation: scroll-left 20s linear infinite, gradient-shift 10s ease infinite alternate; font-size: 1.1rem; font-weight: 500; background: linear-gradient(90deg, #ef4444, #f97316, #eab308, #84cc16, #22c55e, #14b8a6, #0ea5e9, #6366f1, #a855f7, #ec4899, #ef4444); background-size: 300% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; vertical-align: middle; }
+        /* [MODIFIKASI] Hapus ID jam dari sini */
         #welcomeName { font-weight: 400; opacity: 0.8; font-size: 0.9em; margin-left: 5px;}
         @keyframes scroll-left { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
-        .navbar-right-controls { display: flex; align-items: center; gap: 0.5rem; }
-        .theme-toggle-button { background: transparent; border: none; color: var(--gray); width: 44px; height: 44px; border-radius: 50%; font-size: 1.25rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: var(--transition); }
-        .theme-toggle-button:hover { background: var(--card-hover); color: var(--primary); }
-        .products-section { background: var(--card-bg); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-color); margin: 0 1rem 2rem 1rem; text-align: center; }
-        .products-section h2 { font-size: 1.5rem; font-weight: 600; margin-bottom: 0.5rem; }
-        .products-section p { color: var(--gray); margin-bottom: 1.5rem; max-width: 600px; margin-left: auto; margin-right: auto; }
-        .product-buttons { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem; }
-        .play-button { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); border: none; border-radius: 8px; padding: 0.75rem 1.5rem; color: white; cursor: pointer; font-size: 0.95rem; font-weight: 500; text-align: center; transition: var(--transition); display: flex; align-items: center; gap: 8px; text-decoration: none; }
-        .play-button:hover:not(:disabled) { background: linear-gradient(135deg, var(--primary-dark), var(--primary)); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); }
-        .play-button:active:not(:disabled) { transform: translateY(0); box-shadow: 0 2px 6px rgba(99, 102, 241, 0.2); }
-        .play-button.btn-secondary { background: var(--card-hover); color: var(--primary); border: 1px solid var(--primary-light); box-shadow: none; display: inline-flex; justify-content: center; flex-grow: 1; min-width: 150px; }
-        .play-button.btn-secondary:hover:not(:disabled) { background: var(--primary-light); color: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2); }
+        .navbar-actions { display: flex; align-items: center; gap: 0.5rem; position: relative; }
+        .notification-bell-button { background: transparent; border: none; color: var(--gray); width: 44px; height: 44px; border-radius: 50%; font-size: 1.25rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: var(--transition); position: relative; } .notification-bell-button:hover { background: var(--card-hover); color: var(--primary); }
+        .notification-badge { position: absolute; top: 8px; right: 8px; background-color: var(--notif-badge-bg); color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 0.7rem; font-weight: 600; display: flex; align-items: center; justify-content: center; line-height: 1; border: 1px solid var(--darker); transform: scale(0); transition: transform 0.3s ease; } .notification-badge.show { transform: scale(1); }
+        .notification-bell-button.ringing i { animation: ring 1.5s ease-in-out infinite; } @keyframes ring { 0%, 100% { transform: rotate(0); } 10%, 30%, 50%, 70%, 90% { transform: rotate(-10deg); } 20%, 40%, 60%, 80% { transform: rotate(10deg); } }
+        #notification-panel { position: absolute; top: calc(100% + 10px); right: 0; width: 350px; max-height: 400px; overflow-y: auto; background-color: var(--card-bg); border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); border: 1px solid var(--border-color); z-index: 60; opacity: 0; transform: translateY(10px); transition: opacity 0.3s ease, transform 0.3s ease; pointer-events: none; } #notification-panel.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+        #notification-list { list-style: none; padding: 0; margin: 0; } .notification-item { padding: 0.8rem 1rem; border-bottom: 1px solid var(--border-color); display: flex; align-items: flex-start; gap: 0.8rem; cursor: pointer; transition: background-color 0.2s ease; }
+        .notification-item:last-child { border-bottom: none; } .notification-item:hover { background-color: var(--card-hover); }
+        .notification-item.unread { background-color: var(--primary-light); background-opacity: 0.1; } body[data-theme="dark"] .notification-item.unread { background-color: rgba(99, 102, 241, 0.15); }
+        .notification-icon { color: var(--primary); font-size: 1.1rem; margin-top: 2px; flex-shrink: 0; width: 20px; text-align: center; } .notification-content p { margin: 0; font-size: 0.9rem; color: var(--light); line-height: 1.4; } .notification-content .notification-time { font-size: 0.75rem; color: var(--gray); margin-top: 3px; display: block; }
+        #notification-panel-empty { text-align: center; padding: 2rem 1rem; color: var(--gray); font-size: 0.9rem; }
+        #notification-panel::-webkit-scrollbar { width: 6px; } #notification-panel::-webkit-scrollbar-thumb { background-color: var(--gray-light); border-radius: 3px; }
+        .theme-toggle-button { background: transparent; border: none; color: var(--gray); width: 44px; height: 44px; border-radius: 50%; font-size: 1.25rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: var(--transition); } .theme-toggle-button:hover { background: var(--card-hover); color: var(--primary); }
+        .products-section { background: var(--card-bg); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-color); margin: 0 1rem 2rem 1rem; text-align: center; } .products-section h2 { font-size: 1.5rem; font-weight: 600; margin-bottom: 0.5rem; } .products-section p { color: var(--gray); margin-bottom: 1.5rem; max-width: 600px; margin-left: auto; margin-right: auto; } .product-buttons { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem; }
+        .play-button { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); border: none; border-radius: 8px; padding: 0.75rem 1.5rem; color: white; cursor: pointer; font-size: 0.95rem; font-weight: 500; text-align: center; transition: var(--transition); display: flex; align-items: center; gap: 8px; text-decoration: none; } .play-button:hover:not(:disabled) { background: linear-gradient(135deg, var(--primary-dark), var(--primary)); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); } .play-button:active:not(:disabled) { transform: translateY(0); box-shadow: 0 2px 6px rgba(99, 102, 241, 0.2); }
+        .play-button.btn-secondary { background: var(--card-hover); color: var(--primary); border: 1px solid var(--primary-light); box-shadow: none; display: inline-flex; justify-content: center; flex-grow: 1; min-width: 150px; } .play-button.btn-secondary:hover:not(:disabled) { background: var(--primary-light); color: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2); }
         body[data-theme="dark"] .play-button.btn-secondary { color: var(--primary-light); border-color: var(--primary); } body[data-theme="dark"] .play-button.btn-secondary:hover:not(:disabled) { background: var(--primary); color: white; }
-        .stats { display: grid; gap: 1rem; margin-bottom: 2rem; padding: 0 1rem; }
-        @media (min-width: 768px) { .stats { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); } }
-        @media (min-width: 1024px) { .stats { grid-template-columns: repeat(5, 1fr); } }
-        @media (max-width: 768px) and (min-width: 481px) { .stats { grid-template-columns: repeat(3, 1fr); } }
-        @media (max-width: 480px) { .stats { grid-template-columns: repeat(2, 1fr); } }
-        .stats div { background: var(--card-bg); padding: 1.5rem 1rem; border-radius: 12px; text-align: center; transition: var(--transition); border: 1px solid var(--border-color); }
-        .stats div:hover { transform: translateY(-5px); background: var(--card-hover); box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1); }
-        .stats h3 { font-size: 0.95rem; opacity: 0.8; color: var(--gray); margin-bottom: 0.5rem; font-weight: 500; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem; padding: 0 1rem; }
+        @media (min-width: 992px) { .stats { grid-template-columns: repeat(5, 1fr); } } @media (min-width: 768px) and (max-width: 991px) { .stats { grid-template-columns: repeat(3, 1fr); } } @media (max-width: 767px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+        .stats div { background: var(--card-bg); padding: 1.5rem 1rem; border-radius: 12px; text-align: center; transition: var(--transition); border: 1px solid var(--border-color); } .stats div:hover { transform: translateY(-5px); background: var(--card-hover); box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1); }
+        .stats h3 { font-size: 0.95rem; opacity: 0.8; color: var(--gray); margin-bottom: 0.5rem; font-weight: 500; display: flex; align-items: center; justify-content: center; }
+        .stats h3 i { margin-right: 6px; color: var(--primary-light); } body[data-theme="dark"] .stats h3 i { color: var(--primary); }
         .stats p { font-size: 1.5rem; font-weight: 700; }
-        .content { padding: 0 1rem; } .search-container { margin-bottom: 1.5rem; }
-        #apiSearchInput { width: 100%; padding: 12px 16px; border-radius: 8px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--light); font-size: 1rem; transition: var(--transition); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        #apiSearchInput::placeholder { color: var(--gray); opacity: 0.7; }
-        #apiSearchInput:focus { outline: none; border-color: var(--input-focus-border); background: var(--input-focus-bg); box-shadow: 0 0 0 3px var(--input-focus-shadow), 0 2px 4px rgba(0,0,0,0.05); }
-        .tabs { display: flex; gap: 1rem; overflow-x: auto; margin-bottom: 1.5rem; padding-bottom: 6px; scrollbar-width: none; border-bottom: 1px solid var(--border-color); }
-        .tabs::-webkit-scrollbar { display: none; }
-        .tab { background: none; color: var(--gray); border: none; font-weight: 500; border-bottom: 3px solid transparent; padding: 0.75rem 0.25rem; cursor: pointer; font-size: 1rem; white-space: nowrap; transition: var(--transition); margin-bottom: -1px; /* Overlap border */ }
-        .tab.active { color: var(--primary); border-color: var(--primary); font-weight: 600; }
-        body[data-theme="dark"] .tab.active { color: var(--primary-light); border-color: var(--primary-light); }
-        .api-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; margin-bottom: 3rem; }
-        .api-card { background: var(--card-bg); padding: 1.25rem; border-radius: 12px; transition: var(--transition); border: 1px solid var(--border-color); display: flex; flex-direction: column; justify-content: space-between; min-height: 180px; }
-        .api-card:hover { transform: translateY(-5px); background: var(--card-hover); box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); }
-        .api-info { flex-grow: 1; }
-        .api-info h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: space-between; word-break: break-word; }
-        .api-info h3 .new-label { background-color: var(--danger); color: white; font-size: 0.6rem; font-weight: 700; padding: 2px 7px; border-radius: 10px; animation: pulse-danger 1.5s infinite; text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0; margin-left: 8px; }
-        .api-info h3 .new-label.fix-label { background-color: var(--success); animation: pulse-success 1.5s infinite; }
-        @keyframes pulse-danger { 0%, 100% { transform: scale(1); opacity: 0.9; } 50% { transform: scale(1.05); opacity: 1; } }
-        @keyframes pulse-success { 0%, 100% { transform: scale(1); opacity: 0.9; } 50% { transform: scale(1.05); opacity: 1; } }
-        .api-info p { font-size: 0.9rem; color: var(--gray); margin-bottom: 1rem; line-height: 1.6; }
-        .status { padding: 0.3rem 0.7rem; border-radius: 20px; font-size: 0.7rem; display: inline-block; font-weight: 500; margin-top: 0.5rem; text-transform: uppercase; letter-spacing: 0.5px; }
-        .status { background: rgba(16, 185, 129, 0.1); color: var(--success-text); border: 1px solid rgba(16, 185, 129, 0.2); }
-        .status.warning { background: rgba(245, 158, 11, 0.1); color: var(--warning-text); border-color: rgba(245, 158, 11, 0.2); }
-        .status.danger, .status.error { background: rgba(239, 68, 68, 0.1); color: var(--danger-text); border-color: rgba(239, 68, 68, 0.2); }
-        body[data-theme="dark"] .status { background: rgba(74, 222, 128, 0.1); color: #a7f3d0; border-color: rgba(74, 222, 128, 0.3);}
-        body[data-theme="dark"] .status.warning { background: rgba(251, 191, 36, 0.1); color: #fde047; border-color: rgba(251, 191, 36, 0.3);}
-        body[data-theme="dark"] .status.danger, body[data-theme="dark"] .status.error { background: rgba(248, 113, 113, 0.1); color: #fca5a5; border-color: rgba(248, 113, 113, 0.3);}
-        .api-actions { margin-top: 1rem; display: flex; justify-content: flex-end; }
-        .api-card .play-button { width: auto; padding: 0.5rem 1rem; font-size: 0.875rem; }
-        .footer { text-align: center; padding: 2rem 1rem 1rem 1rem; color: var(--gray); font-size: 0.9rem; border-top: 1px solid var(--border-color); margin-top: 2rem; }
-        .contact { margin-top: 1rem; display: flex; justify-content: center; gap: 1rem; }
-        .contact a { color: var(--gray); text-decoration: none; font-size: 1.25rem; transition: var(--transition); width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--card-bg); border: 1px solid var(--border-color); }
-        .contact a:hover { color: white; background: var(--primary); transform: translateY(-3px); border-color: var(--primary); }
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .fade-in { animation: fadeInUp 0.5s ease-out forwards; opacity: 0; }
-        #notification { position: fixed; top: 0; left: 50%; transform: translateX(-50%) translateY(-120%); min-width: 250px; max-width: 90%; padding: 0.9rem 1.5rem; border-radius: 8px; background-color: var(--card-bg); text-align: center; font-size: 0.95rem; font-weight: 500; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); z-index: 1000; transition: transform 0.4s ease-in-out; border: 1px solid var(--border-color); }
-        #notification.show { transform: translateX(-50%) translateY(20px); }
-        #notification.error { background-color: var(--danger-bg); color: var(--danger-text); border-color: var(--danger); }
-        #notification.success { background-color: var(--success-bg); color: var(--success-text); border-color: var(--success); }
-        #blacklistDisplay { background: var(--card-bg); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-color); margin: 0 1rem 2rem 1rem; }
-        #blacklistDisplay h2 { font-size: 1.3rem; margin-bottom: 1rem; font-weight: 600; display: flex; align-items: center; justify-content: space-between; }
-        #blacklistDisplay h2 .refresh-blacklist-btn { background: none; border: none; color: var(--gray); font-size: 1rem; cursor: pointer; padding: 5px; transition: color 0.2s; }
-        #blacklistDisplay h2 .refresh-blacklist-btn:hover { color: var(--primary); }
-        #publicBlacklist { list-style: none; padding: 0.8rem; margin: 0; max-height: 150px; overflow-y: auto; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 0.9rem; color: var(--gray); background: var(--pre-bg); border-radius: 8px; border: 1px solid var(--pre-border); }
-        #publicBlacklist.empty { text-align: center; padding: 1rem; font-family: inherit; font-style: italic; background: none; border: none; }
-        #publicBlacklist::-webkit-scrollbar { width: 6px; } #publicBlacklist::-webkit-scrollbar-track { background: transparent; } #publicBlacklist::-webkit-scrollbar-thumb { background-color: var(--gray); border-radius: 3px; }
-        #donationQR { max-width: 180px; height: 180px; border-radius: 8px; background: white; padding: 5px; margin: 0 auto 1rem auto; display: block; cursor: zoom-in; transition: transform 0.2s ease; }
-        #donationQR:hover { transform: scale(1.05); }
-        .donation-controls { display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-bottom: 1.5rem; }
-        #dontShowAgainCheckbox { width: 16px; height: 16px; accent-color: var(--primary); }
-        .donation-controls label { color: var(--gray); font-size: 0.9rem; cursor: pointer; margin-bottom: 0; }
-        .qr-lightbox-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.8); display: flex; align-items: center; justify-content: center; z-index: 101; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; cursor: zoom-out; }
-        .qr-lightbox-overlay.active { opacity: 1; pointer-events: all; }
-        #lightboxImage { max-width: 90vw; max-height: 90vh; width: auto; height: auto; background: white; padding: 10px; border-radius: 12px; cursor: default; transform: scale(0.8); transition: transform 0.3s ease; }
-        .qr-lightbox-overlay.active #lightboxImage { transform: scale(1); }
-        #musicFabContainer { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 90; opacity: 0; transition: opacity 0.5s ease; pointer-events: none; }
-        body.loaded #musicFabContainer.visible { opacity: 1; pointer-events: auto; }
-        #fabToggleBtn { width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); border: none; color: white; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.2); transition: var(--transition); }
-        #fabToggleBtn:hover { transform: scale(1.05); box-shadow: 0 6px 16px rgba(0,0,0,0.25); }
-        #musicControlsExpanded { position: absolute; bottom: calc(100% + 0.75rem); right: 0; display: none; flex-direction: column; align-items: center; gap: 0.75rem; background: var(--card-bg); padding: 1rem; border-radius: 12px; box-shadow: 0 6px 16px rgba(0,0,0,0.2); border: 1px solid var(--border-color); transition: opacity 0.3s ease, transform 0.3s ease; opacity: 0; transform: translateY(10px); pointer-events: none; width: 180px; }
+        .content { padding: 0 1rem; } .search-container { margin-bottom: 1.5rem; } #apiSearchInput { width: 100%; padding: 12px 16px; border-radius: 8px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--light); font-size: 1rem; transition: var(--transition); box-shadow: 0 2px 4px rgba(0,0,0,0.05); } #apiSearchInput::placeholder { color: var(--gray); opacity: 0.7; } #apiSearchInput:focus { outline: none; border-color: var(--input-focus-border); background: var(--input-focus-bg); box-shadow: 0 0 0 3px var(--input-focus-shadow), 0 2px 4px rgba(0,0,0,0.05); }
+        .tabs { display: flex; gap: 1rem; overflow-x: auto; margin-bottom: 1.5rem; padding-bottom: 6px; scrollbar-width: none; border-bottom: 1px solid var(--border-color); } .tabs::-webkit-scrollbar { display: none; } .tab { background: none; color: var(--gray); border: none; font-weight: 500; border-bottom: 3px solid transparent; padding: 0.75rem 0.25rem; cursor: pointer; font-size: 1rem; white-space: nowrap; transition: var(--transition); margin-bottom: -1px; } .tab.active { color: var(--primary); border-color: var(--primary); font-weight: 600; } body[data-theme="dark"] .tab.active { color: var(--primary-light); border-color: var(--primary-light); }
+        .api-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; margin-bottom: 3rem; } .api-card { background: var(--card-bg); padding: 1.25rem; border-radius: 12px; transition: var(--transition); border: 1px solid var(--border-color); display: flex; flex-direction: column; justify-content: space-between; min-height: 180px; } .api-card:hover { transform: translateY(-5px); background: var(--card-hover); box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); } .api-info { flex-grow: 1; } .api-info h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: space-between; word-break: break-word; }
+        .api-info h3 .new-label { background-color: var(--danger); color: white; font-size: 0.6rem; font-weight: 700; padding: 2px 7px; border-radius: 10px; animation: pulse-danger 1.5s infinite; text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0; margin-left: 8px; } .api-info h3 .new-label.fix-label { background-color: var(--success); animation: pulse-success 1.5s infinite; }
+        @keyframes pulse-danger { 0%, 100% { transform: scale(1); opacity: 0.9; } 50% { transform: scale(1.05); opacity: 1; } } @keyframes pulse-success { 0%, 100% { transform: scale(1); opacity: 0.9; } 50% { transform: scale(1.05); opacity: 1; } }
+        .api-info p { font-size: 0.9rem; color: var(--gray); margin-bottom: 1rem; line-height: 1.6; } .status { padding: 0.3rem 0.7rem; border-radius: 20px; font-size: 0.7rem; display: inline-block; font-weight: 500; margin-top: 0.5rem; text-transform: uppercase; letter-spacing: 0.5px; } .status { background: rgba(16, 185, 129, 0.1); color: var(--success-text); border: 1px solid rgba(16, 185, 129, 0.2); } .status.warning { background: rgba(245, 158, 11, 0.1); color: var(--warning-text); border-color: rgba(245, 158, 11, 0.2); } .status.danger, .status.error { background: rgba(239, 68, 68, 0.1); color: var(--danger-text); border-color: rgba(239, 68, 68, 0.2); }
+        body[data-theme="dark"] .status { background: rgba(74, 222, 128, 0.1); color: #a7f3d0; border-color: rgba(74, 222, 128, 0.3);} body[data-theme="dark"] .status.warning { background: rgba(251, 191, 36, 0.1); color: #fde047; border-color: rgba(251, 191, 36, 0.3);} body[data-theme="dark"] .status.danger, body[data-theme="dark"] .status.error { background: rgba(248, 113, 113, 0.1); color: #fca5a5; border-color: rgba(248, 113, 113, 0.3);}
+        .api-actions { margin-top: 1rem; display: flex; justify-content: flex-end; } .api-card .play-button { width: auto; padding: 0.5rem 1rem; font-size: 0.875rem; }
+        .footer { text-align: center; padding: 2rem 1rem 1rem 1rem; color: var(--gray); font-size: 0.9rem; border-top: 1px solid var(--border-color); margin-top: 2rem; } .contact { margin-top: 1rem; display: flex; justify-content: center; gap: 1rem; } .contact a { color: var(--gray); text-decoration: none; font-size: 1.25rem; transition: var(--transition); width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--card-bg); border: 1px solid var(--border-color); } .contact a:hover { color: white; background: var(--primary); transform: translateY(-3px); border-color: var(--primary); }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } } .fade-in { animation: fadeInUp 0.5s ease-out forwards; opacity: 0; }
+        #notification { position: fixed; top: 0; left: 50%; transform: translateX(-50%) translateY(-120%); min-width: 250px; max-width: 90%; padding: 0.9rem 1.5rem; border-radius: 8px; background-color: var(--card-bg); text-align: center; font-size: 0.95rem; font-weight: 500; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); z-index: 1000; transition: transform 0.4s ease-in-out; border: 1px solid var(--border-color); } #notification.show { transform: translateX(-50%) translateY(20px); } #notification.error { background-color: var(--danger-bg); color: var(--danger-text); border-color: var(--danger); } #notification.success { background-color: var(--success-bg); color: var(--success-text); border-color: var(--success); }
+        #blacklistDisplay { background: var(--card-bg); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-color); margin: 0 1rem 2rem 1rem; } #blacklistDisplay h2 { font-size: 1.3rem; margin-bottom: 1rem; font-weight: 600; display: flex; align-items: center; justify-content: space-between; } #blacklistDisplay h2 .refresh-blacklist-btn { background: none; border: none; color: var(--gray); font-size: 1rem; cursor: pointer; padding: 5px; transition: color 0.2s; } #blacklistDisplay h2 .refresh-blacklist-btn:hover { color: var(--primary); }
+        #publicBlacklist { list-style: none; padding: 0.8rem; margin: 0; max-height: 150px; overflow-y: auto; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 0.9rem; color: var(--gray); background: var(--pre-bg); border-radius: 8px; border: 1px solid var(--pre-border); } #publicBlacklist li { padding: 0.2rem 0; word-break: break-all; } #publicBlacklist.empty { text-align: center; padding: 1rem; font-family: inherit; font-style: italic; background: none; border: none; } #publicBlacklist::-webkit-scrollbar { width: 6px; } #publicBlacklist::-webkit-scrollbar-track { background: transparent; } #publicBlacklist::-webkit-scrollbar-thumb { background-color: var(--gray); border-radius: 3px; }
+        #donationQR { max-width: 180px; height: 180px; border-radius: 8px; background: white; padding: 5px; margin: 0 auto 1rem auto; display: block; cursor: zoom-in; transition: transform 0.2s ease; } #donationQR:hover { transform: scale(1.05); } .donation-controls { display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-bottom: 1.5rem; } #dontShowAgainCheckbox { width: 16px; height: 16px; accent-color: var(--primary); } .donation-controls label { color: var(--gray); font-size: 0.9rem; cursor: pointer; margin-bottom: 0; }
+        .qr-lightbox-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.8); display: flex; align-items: center; justify-content: center; z-index: 101; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; cursor: zoom-out; } .qr-lightbox-overlay.active { opacity: 1; pointer-events: all; } #lightboxImage { max-width: 90vw; max-height: 90vh; width: auto; height: auto; background: white; padding: 10px; border-radius: 12px; cursor: default; transform: scale(0.8); transition: transform 0.3s ease; } .qr-lightbox-overlay.active #lightboxImage { transform: scale(1); }
+        /* Music FAB Styles */
+        #musicFabContainer { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 90; }
+        #fabToggleBtn { width: var(--fab-size); height: var(--fab-size); border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); border: none; color: white; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.2); transition: var(--transition); } #fabToggleBtn:hover { transform: scale(1.05); box-shadow: 0 6px 16px rgba(0,0,0,0.25); }
+        #musicControlsExpanded { position: absolute; bottom: calc(100% + 0.75rem); right: 0; display: none; flex-direction: column; align-items: center; gap: 0.75rem; background: var(--card-bg); padding: 1rem; border-radius: 12px; box-shadow: 0 6px 16px rgba(0,0,0,0.2); border: 1px solid var(--border-color); transition: opacity 0.3s ease, transform 0.3s ease; opacity: 0; transform: translateY(10px); pointer-events: none; width: 150px; }
         #musicControlsExpanded.active { display: flex; opacity: 1; transform: translateY(0); pointer-events: auto; }
-        #musicControlsExpanded .controls-row { display: flex; justify-content: space-around; align-items: center; width: 100%; margin-bottom: 0.5rem; }
-        #musicControlsExpanded button { background: none; border: none; color: var(--gray); font-size: 1.2rem; cursor: pointer; padding: 0.4rem; line-height: 1; transition: color 0.2s ease, transform 0.2s ease; flex-grow: 1; text-align: center; }
-        #musicControlsExpanded button:hover { color: var(--light); transform: scale(1.1); }
-        #volumeSlider { width: 80%; height: 5px; cursor: pointer; accent-color: var(--primary); margin-top: 0.5rem; appearance: none; background: var(--gray-300); border-radius: 5px; outline: none; }
-        #volumeSlider::-webkit-slider-thumb { appearance: none; width: 16px; height: 16px; background: var(--primary); border-radius: 50%; cursor: pointer; }
-        #volumeSlider::-moz-range-thumb { width: 16px; height: 16px; background: var(--primary); border-radius: 50%; cursor: pointer; border: none; }
-        body[data-theme="dark"] #volumeSlider { background: var(--gray-700); }
-        @media (max-width: 768px) {
-            body { padding: calc(var(--header-height) + 0.5rem) 0.5rem 0.5rem 0.5rem; }
-            .hero, .products-section, .stats, .content, .footer, #blacklistDisplay { padding-left: 0.5rem; padding-right: 0.5rem; margin-left: 0; margin-right: 0;}
-            .hero h2 { font-size: 2rem; } .hero p { font-size: 1rem; } .api-list { grid-template-columns: 1fr; }
-            .top-navbar { padding: 0 0.5rem 0 1rem; } .navbar-scrolling-text-wrapper { margin: 0 1rem; }
-            #musicFabContainer { bottom: 1rem; right: 1rem; }
-        }
-        @media (max-width: 480px) {
-            .hero h2 { font-size: 1.75rem; }
-            .top-navbar { padding: 0 0.5rem; } .navbar-logo img { height: 28px; width: 28px; }
-            .navbar-scrolling-text-wrapper { margin: 0 0.5rem; }
-            .scrolling-text { font-size: 0.9rem; }
-            .product-buttons { flex-direction: column; }
-            #musicFabContainer { bottom: 0.5rem; right: 0.5rem; }
-            #fabToggleBtn { width: 48px; height: 48px; font-size: 1.2rem; }
-        }
+        .music-buttons-row { display: flex; justify-content: space-around; width: 100%; margin-bottom: 0.5rem; }
+        #musicControlsExpanded button { background: none; border: none; color: var(--gray); font-size: 1.3rem; cursor: pointer; padding: 0.3rem; line-height: 1; transition: color 0.2s ease, transform 0.2s ease; } #musicControlsExpanded button:hover { color: var(--light); transform: scale(1.1); }
+        #volumeSlider { width: 100%; height: 5px; cursor: pointer; accent-color: var(--primary); margin-top: 0.5rem; } #volumeSlider::-webkit-slider-thumb { appearance: none; width: 16px; height: 16px; background: var(--primary); border-radius: 50%; cursor: grab; } #volumeSlider::-moz-range-thumb { width: 16px; height: 16px; background: var(--primary); border-radius: 50%; border: none; cursor: grab; }
+        /* Toast Notification (iPhone Style) */
+        #toast-notification { position: fixed; top: 0; left: 1rem; right: 1rem; margin-top: 1rem; padding: 0.9rem 1.2rem; border-radius: 0.75rem; font-size: 0.9rem; font-weight: 500; color: #fff; background-color: rgba(30, 30, 30, 0.9); box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); transform: translateY(-150%); transition: transform 0.5s cubic-bezier(0.215, 0.610, 0.355, 1); z-index: 1050; display: flex; align-items: center; gap: 0.75rem; border: 1px solid rgba(255, 255, 255, 0.1); max-width: 400px; margin-left: auto; margin-right: auto; backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); }
+        #toast-notification.show { transform: translateY(0); }
+        #toast-notification .toast-icon { font-size: 1.1rem; flex-shrink: 0; }
+        #toast-notification .toast-message { flex-grow: 1; }
+        body[data-theme="light"] #toast-notification { background-color: rgba(255, 255, 255, 0.9); color: #111; border: 1px solid rgba(0, 0, 0, 0.1); box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); }
+
+        /* [MODIFIKASI] Clock FAB Styles */
+        #clockFabContainer { position: fixed; /* Posisi di atas music FAB */ bottom: calc(1.5rem + var(--fab-size) + var(--fab-spacing)); right: 1.5rem; z-index: 89; /* Di bawah music FAB */ }
+        #clockFabToggleBtn { width: var(--fab-size); height: var(--fab-size); border-radius: 50%; background: linear-gradient(135deg, var(--secondary), #ec4899); /* Warna beda */ border: none; color: white; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.2); transition: var(--transition); }
+        #clockFabToggleBtn:hover { transform: scale(1.05); box-shadow: 0 6px 16px rgba(0,0,0,0.25); }
+        #clockDetailsExpanded { position: absolute; bottom: calc(100% + 0.75rem); right: 0; display: none; background: var(--card-bg); padding: 1rem; border-radius: 12px; box-shadow: 0 6px 16px rgba(0,0,0,0.2); border: 1px solid var(--border-color); transition: opacity 0.3s ease, transform 0.3s ease; opacity: 0; transform: translateY(10px); pointer-events: none; width: 280px; /* Lebih lebar */ text-align: center; }
+        #clockDetailsExpanded.active { display: block; opacity: 1; transform: translateY(0); pointer-events: auto; }
+        #fullDateTime { font-size: 0.95rem; color: var(--light); font-weight: 500; }
+
+        @media (max-width: 768px) { body { padding: calc(var(--header-height) + 0.5rem) 0.5rem 0.5rem 0.5rem; } .hero, .products-section, .stats, .content, .footer, #blacklistDisplay { padding-left: 0.5rem; padding-right: 0.5rem; margin-left: 0; margin-right: 0;} .hero h2 { font-size: 2rem; } .hero p { font-size: 1rem; } .api-list { grid-template-columns: 1fr; } .top-navbar { padding: 0 1rem; } .navbar-scrolling-text-wrapper { margin: 0 0.5rem; } #musicFabContainer { bottom: 1rem; right: 1rem; } #clockFabContainer { bottom: calc(1rem + var(--fab-size) + var(--fab-spacing)); right: 1rem; } /* Sesuaikan posisi clock FAB */ #notification-panel { width: calc(100vw - 2rem); max-width: 350px; } }
+        @media (max-width: 480px) { .hero h2 { font-size: 1.75rem; } .top-navbar { padding: 0 0.5rem; } .navbar-logo img { height: 28px; width: 28px; } .navbar-scrolling-text-wrapper { margin: 0 0.5rem; } .scrolling-text { font-size: 0.9rem; } .product-buttons { flex-direction: column; } #musicFabContainer { bottom: 1rem; right: 1rem; } #clockFabContainer { bottom: calc(1rem + var(--fab-size) + var(--fab-spacing)); right: 1rem; } .navbar-actions { gap: 0.2rem; } .notification-bell-button, .theme-toggle-button { width: 40px; height: 40px; font-size: 1.1rem; } .notification-badge { width: 16px; height: 16px; font-size: 0.65rem; top: 6px; right: 6px; } #toast-notification { left: 0.5rem; right: 0.5rem; } #clockDetailsExpanded { width: calc(100vw - 2rem); max-width: 280px; /* Lebar panel jam di mobile */ } }
+
     </style>
 </head>
 <body>
-    <div class="modal" id="donationModal">
-        <div class="modal-dialog" style="max-width: 400px; text-align: center;">
-            <div class="modal-header" style="border:none;margin-bottom:0;"><h5 style="width: 100%; text-align: center;">Support Us</h5></div>
-            <div class="modal-body" style="padding-top: 0;">
-                <p style="color: var(--gray); margin-bottom: 1.5rem; font-size: 0.95rem;">Jika API ini bermanfaat, support kami.</p>
-                <img src="/images/donasi-qr.png" alt="Donation QR Code" id="donationQR">
-                <div class="donation-controls">
-                    <input type="checkbox" id="dontShowAgainCheckbox" name="dontShowAgain">
-                    <label for="dontShowAgainCheckbox">Jangan tampilkan lagi</label>
-                </div>
-                <button id="continueBtn" class="play-button" style="width: 100%; margin-top: 1rem; justify-content: center;"> Lanjut </button>
-            </div>
-        </div>
-    </div>
-
-    <div id="preloader">
-        <div class="loader-content">
-            <img src="/icon.png" alt="Loading..." class="pulsing-logo">
-            <p id="loadingStatusText">Connecting to server...</p>
-            <div class="progress-bar-container">
-                <div id="loadingProgressBar" class="progress-bar" style="width: 0%;"></div>
-            </div>
-            <button id="enterButton" class="play-button" style="display: none; margin-top: 2rem; min-width: 200px; justify-content: center; background: linear-gradient(135deg, var(--warning), #f97316); box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);">
-                <i class="fa-solid fa-hand-pointer"></i> Tap to Enter
-            </button>
-        </div>
-    </div>
-
-    <div id="realtimeNotification">
-        <i id="realtimeNotificationIcon" class="fa fa-info-circle"></i>
-        <span id="realtimeNotificationText"></span>
-    </div>
-
-    <div id="notification"></div>
-
-    <header class="top-navbar">
+    <div id="toast-notification"> <i id="toast-icon" class="fas fa-info-circle toast-icon"></i> <span id="toast-message" class="toast-message">Notification message</span> </div>
+    <div class="modal" id="donationModal"> <div class="modal-dialog" style="max-width: 400px; text-align: center;"> <div class="modal-header" style="border:none;margin-bottom:0;"><h5 style="width: 100%; text-align: center;">Support Us</h5></div> <div class="modal-body" style="padding-top: 0;"> <p style="color: var(--gray); margin-bottom: 1.5rem; font-size: 0.95rem;">Jika API ini bermanfaat, support kami.</p> <img src="/images/donasi-qr.png" alt="Donation QR Code" id="donationQR"> <div class="donation-controls"> <input type="checkbox" id="dontShowAgainCheckbox" name="dontShowAgain"> <label for="dontShowAgainCheckbox">Jangan tampilkan lagi</label> </div> <button id="continueBtn" class="play-button" style="width: 100%; margin-top: 1rem; justify-content: center;"> Lanjut </button> </div> </div> </div>
+    <div id="preloader"> <div class="loader-content"> <img src="/icon.png" alt="Loading..." class="pulsing-logo"> <p id="loadingStatusText">Connecting to server...</p> <div class="progress-bar-container"> <div id="loadingProgressBar" class="progress-bar" style="width: 0%;"></div> </div> <button id="enterButton" class="play-button" style="display: none; margin-top: 2rem; min-width: 200px; justify-content: center; background: linear-gradient(135deg, var(--warning), #f97316); box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);"> <i class="fa-solid fa-hand-pointer"></i> Tap to Enter </button> </div> </div>
+    <div id="notification"></div> <header class="top-navbar">
          <div class="navbar-logo"><img src="/icon.png" alt="Logo"></div>
-         <div class="navbar-scrolling-text-wrapper"><div class="scrolling-text-container"><span class="scrolling-text">Selamat Datang di Rikishopreal Api! <span id="welcomeName"></span></span></div></div>
-         <div class="navbar-right-controls">
-             <div class="notification-bell-container">
-                 <button id="notificationBell" aria-label="Notifications">
-                     <i class="fa fa-bell"></i>
-                 </button>
-                 <span id="notificationBadge">0</span>
-                 <ul id="notificationList">
-                     <li class="no-notifications">Belum ada notifikasi.</li>
-                 </ul>
+         <div class="navbar-scrolling-text-wrapper">
+             <div class="scrolling-text-container">
+                 <span class="scrolling-text">
+                     Selamat Datang di Rikishopreal Api!
+                     <span id="welcomeName"></span>
+                     </span>
              </div>
-             <div class="navbar-theme-switcher"><button id="theme-toggle-btn" class="theme-toggle-button" aria-label="Toggle theme"></button></div>
+         </div>
+         <div class="navbar-actions">
+             <button id="notification-bell-btn" class="notification-bell-button" aria-label="Notifications"> <i class="fas fa-bell"></i> <span id="notification-badge" class="notification-badge" style="display: none;">0</span> </button>
+             <div id="notification-panel"> <ul id="notification-list"> <li id="notification-panel-empty">Tidak ada notifikasi baru.</li> </ul> </div>
+             <button id="theme-toggle-btn" class="theme-toggle-button" aria-label="Toggle theme"></button>
          </div>
     </header>
 
     <div class="container">
         <section class="hero fade-in" style="opacity:0;"> <div class="api-platform-badge" id="apiPlatformBadge"><i class="fa-solid fa-rocket"></i> REST API Platform</div> <div class="hero-header"><h2 id="apiTitle">API Title</h2></div> <p>Unlock the power of seamless integration with our comprehensive API suite.</p> </section>
         <section class="products-section fade-in" style="opacity:0; animation-delay: 0.1s;"> <h2>Jelajahi Produk Kami</h2> <p>Butuh script, layanan digital, atau produk premium lainnya?</p> <div class="product-buttons"> <button id="aboutApiBtn" class="play-button btn-secondary"> <i class="fa-solid fa-info-circle"></i> Tentang API </button> <a href="https://toko.rikishop.my.id" target="_blank" rel="noopener noreferrer" class="play-button"> <i class="fa-solid fa-store"></i> Kunjungi Toko </a> <button id="reportErrorBtn" class="play-button btn-secondary"> <i class="fa-solid fa-bug"></i> Lapor Error </button> <button id="requestFeatureBtn" class="play-button btn-secondary"> <i class="fa-solid fa-wand-magic-sparkles"></i> Request Fitur </button> </div> </section>
+
         <section class="stats fade-in" style="opacity:0; animation-delay: 0.2s;">
-            <div><h3>Total Request</h3><p id="totalRequests">0</p></div>
-            <div><h3>Total Pengguna</h3><p id="uniqueUsers">0</p></div>
-            <div><h3>Server Uptime</h3><p id="serverUptime">0s</p></div>
-            <div><h3>API Status</h3><p id="apiGeneralStatus" style="color: var(--success);">Online</p></div>
-            <div><h3>Daily Limit</h3><p><span id="currentLimitStat">...</span> / IP</p></div>
+            <div><h3><i class="fas fa-chart-line"></i> Total Request</h3><p id="totalRequests">0</p></div>
+            <div><h3><i class="fas fa-users"></i> Unique Visitors</h3><p id="uniqueVisitors">0</p></div>
+            <div><h3><i class="fas fa-clock"></i> Server Uptime</h3><p id="serverUptime">0s</p></div>
+            <div><h3><i class="fas fa-heartbeat"></i> API Status</h3><p id="apiGeneralStatus" style="color: var(--success);">Online</p></div>
+            <div><h3><i class="fas fa-tasks"></i> Daily Limit</h3><p><span id="currentLimitStat">...</span> / IP</p></div>
         </section>
+
         <section class="content fade-in" id="apiContentSection" style="opacity:0; animation-delay: 0.3s;"> <div class="search-container"><input type="search" id="apiSearchInput" placeholder="🔍 Cari endpoint..."></div> <div class="tabs" id="tabs"></div> <div id="api-list" class="api-list"></div> </section>
         <section id="blacklistDisplay" class="fade-in" style="opacity:0; animation-delay: 0.4s;"> <h2> <i class="fas fa-user-slash" style="margin-right: 8px; color: var(--danger);"></i> IP Blacklist <button id="refreshPublicBlacklistBtn" class="refresh-blacklist-btn" title="Refresh Blacklist"><i class="fas fa-sync-alt"></i></button> </h2> <ul id="publicBlacklist" class="empty"><li>Loading...</li></ul> </section>
     </div>
@@ -345,195 +216,191 @@
     <div class="modal" id="aboutApiModal"> <div class="modal-dialog"> <div class="modal-header"> <div> <h5 id="aboutApiModalTitle">Tentang API</h5> <span id="aboutApiCreator">By ...</span> </div> <button class="btn-close about-close">×</button> </div> <div class="modal-body" style="font-size: 0.95rem; line-height: 1.6; color: var(--gray);"> <p>Selamat datang di <strong id="aboutApiName" style="color: var(--light);">...</strong>!</p> <p>API RESTful ini menyediakan berbagai endpoint.</p> <p><strong>Tujuan:</strong> Akses mudah, cepat, stabil.</p> <p>Gunakan tombol <i class="fa fa-play"></i> <strong>Try it now</strong>.</p> <br> <p>Terima kasih!</p> </div> </div> </div>
     <div id="qrLightbox" class="qr-lightbox-overlay"> <img src="" alt="Zoomed QR Code" id="lightboxImage"> </div>
 
-    <audio id="backgroundMusic" loop> <source src="/audio/music.mp3" type="audio/mpeg"> </audio>
-    <div id="musicFabContainer">
-        <div id="musicControlsExpanded">
-            <div class="controls-row">
-                 <button id="playPauseBtn" title="Play/Pause"><i class="fas fa-play"></i></button>
-                 <button id="muteBtn" title="Mute/Unmute"><i class="fas fa-volume-up"></i></button>
-            </div>
-            <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.5" title="Volume">
+    <audio id="backgroundMusic" loop> <source src="/audio/music.mp3" type="audio/mpeg"> Your browser does not support the audio element. </audio>
+    <div id="musicFabContainer" style="opacity: 0; transition: opacity 0.5s ease;"> <div id="musicControlsExpanded"> <div class="music-buttons-row"> <button id="playPauseBtn" title="Play/Pause"><i class="fas fa-play"></i></button> <button id="muteBtn" title="Mute/Unmute"><i class="fas fa-volume-up"></i></button> </div> <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.5" title="Volume"> </div> <button id="fabToggleBtn" title="Music Controls"><i class="fas fa-music"></i></button> </div>
+
+    <div id="clockFabContainer" style="opacity: 0; transition: opacity 0.5s ease;">
+        <div id="clockDetailsExpanded">
+            <span id="fullDateTime">Loading time...</span>
         </div>
-        <button id="fabToggleBtn" title="Music Controls"><i class="fas fa-music"></i></button>
+        <button id="clockFabToggleBtn" title="Show Date/Time">
+            <i class="fas fa-clock"></i>
+        </button>
     </div>
 
-    <footer class="footer">
-        <div id="credits">© 2025 Developer</div>
-        <div class="contact">
-            <a id="githubLink" href="#" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
-            <a id="whatsappLink" href="#" target="_blank" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
-            <a id="youtubeLink" href="#" target="_blank" title="YouTube"><i class="fab fa-youtube"></i></a>
-        </div>
-    </footer>
+    <footer class="footer"> <div id="credits">© 2025 Developer</div> <div class="contact"> <a id="githubLink" href="#" target="_blank" title="GitHub"><i class="fab fa-github"></i></a> <a id="whatsappLink" href="#" target="_blank" title="WhatsApp"><i class="fab fa-whatsapp"></i></a> <a id="youtubeLink" href="#" target="_blank" title="YouTube"><i class="fab fa-youtube"></i></a> </div> </footer>
 
     <script defer>
         console.log("Script start");
 
+        // --- Helpers ---
         const $ = (s) => document.querySelector(s);
         const $$ = (s) => document.querySelectorAll(s);
         const NGL_PROXY = "https://api.siputzx.my.id/api/tools/ngl?link=https%3A%2F%2Fngl.link%2Frikishop";
         let endpointStatuses = {}, currentEndpointPath = "", settings = {};
-        let realtimeNotifyTimeout, notifyTimeout;
-
-        function showRealtimeNotification(message, iconClass = 'fa-info-circle') {
-            try {
-                const n = $('#realtimeNotification'); const nText = $('#realtimeNotificationText'); const nIcon = $('#realtimeNotificationIcon');
-                if (!n || !nText || !nIcon) return;
-                clearTimeout(realtimeNotifyTimeout);
-                nText.textContent = message;
-                nIcon.className = `fa ${iconClass}`;
-                n.classList.add('show');
-                realtimeNotifyTimeout = setTimeout(() => n.classList.remove('show'), 5000);
-            } catch(e){ console.error("showRealtimeNotification error:", e); }
-        }
-
-        function showNotification(msg, type = 'info') {
-             try {
-                 const n = $('#notification');
-                 if (!n) return;
-                 clearTimeout(notifyTimeout);
-                 n.textContent = msg;
-                 n.className = 'notification';
-                 if (type === 'success') n.classList.add('success');
-                 else if (type === 'error') n.classList.add('error');
-                 n.classList.add('show');
-                 notifyTimeout = setTimeout(() => n.classList.remove('show'), 3000);
-             } catch(e){ console.error("showNotification error:", e); }
-        }
+        let lastNotificationTimestamp = 0;
+        let notificationPollInterval;
+        let unreadNotificationCount = 0;
+        let allNotifications = [];
+        let toastTimeout;
+        let clockInterval;
 
         function highlightJSON(json) { try { if (typeof json != 'string') json = JSON.stringify(json, undefined, 2); json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, m => `<span class="${/^"/.test(m)?/:$/.test(m)?'json-key':'json-string':/true|false/.test(m)?'json-boolean':/null/.test(m)?'json-null':'json-number'}">${m}</span>`); } catch (e) { console.error("Highlight JSON error:", e); return `<span style="color:var(--danger-text)">Invalid JSON Response</span>`; } }
-        function copyToClipboard(text, btn, msg = "Copied!", isUrl = false) { try { if(!btn) return; const original = btn.innerHTML; const feedback = s => { btn.innerHTML = s ? `<i class="fas fa-check"></i> ${msg}` : `<i class="fas fa-times"></i> Gagal`; showNotification(s ? msg : "Gagal menyalin!", s ? 'success' : 'error'); setTimeout(() => { if(btn) btn.innerHTML = original; }, 2000); }; if (navigator.clipboard) navigator.clipboard.writeText(text).then(() => feedback(true)).catch(fallback); else fallback(); function fallback(){try{const ta=document.createElement("textarea");ta.value=text;ta.style.cssText='position:fixed;top:-999px;';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);feedback(true);}catch(e){feedback(false);}}} catch(e){ console.error("copyToClipboard error:", e); showNotification("Copy error!", "error"); }}
+        let notifyTimeout; function showNotification(msg, type = 'info') { try { const n = $('#notification'); if (!n) return; clearTimeout(notifyTimeout); n.textContent = msg; n.className = 'notification'; n.classList.add(type, 'show'); notifyTimeout = setTimeout(() => n.classList.remove('show'), 3000); } catch(e){ console.error("showNotification error:", e); } }
+        function copyToClipboard(text, btn, msg = "Copied!", isUrl = false) { try { if(!btn) return; const original = btn.innerHTML; const feedback = s => { btn.innerHTML = s ? `<i class="fas fa-check"></i> ${msg}` : `<i class="fas fa-times"></i> Gagal`; showNotification(s ? msg : "Gagal menyalin!", s ? 'success' : 'error'); setTimeout(() => { if(btn) btn.innerHTML = original; }, 2000); }; if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).then(() => feedback(true)).catch(fallback); else fallback(); function fallback(){try{const ta=document.createElement("textarea");ta.value=text;ta.style.cssText='position:fixed;top:-999px;left:-999px;';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);feedback(true);}catch(e){console.error('Fallback copy error:', e); feedback(false);}}} catch(e){ console.error("copyToClipboard error:", e); showNotification("Copy error!", "error"); }}
         async function updateStatuses() { try { const r = await fetch('/api/endpoint-status'); if (r.ok) endpointStatuses = (await r.json()).data || {}; } catch (e) {console.warn("Could not poll status:", e);} finally { $$('.status[data-path]').forEach(s => {try{const p=s.dataset.path; if(endpointStatuses[p]&&s.textContent!==endpointStatuses[p]){s.textContent=endpointStatuses[p]; s.className='status '+(endpointStatuses[p].toLowerCase().includes('error')?'danger':(endpointStatuses[p].toLowerCase().includes('warning')?'warning':''));}}catch(e){console.error('Error updating status DOM:', e)}});}}
         function startStatusPolling() { try { updateStatuses(); setInterval(updateStatuses, 30000); } catch(e){ console.error("startStatusPolling error:", e); } }
         function filterApiCards() { try { const term = $('#apiSearchInput')?.value.toLowerCase().trim() ?? ''; const list = $('#api-list'); const cards = list?.querySelectorAll('.api-card'); if(!list || !cards) return; let vis = 0; cards.forEach(c => { const match = term === '' || c.textContent.toLowerCase().includes(term); c.style.display = match ? 'flex' : 'none'; if(match) vis++; }); const noRes = $('#noResultsMessage'); if(vis === 0 && term){if(!noRes){const m=document.createElement('p'); m.id='noResultsMessage'; m.textContent='Endpoint tidak ditemukan.'; m.style.cssText='text-align:center;color:var(--gray);margin-top:1.5rem;grid-column: 1 / -1;'; list.appendChild(m);}} else if(noRes) noRes.remove(); } catch(e){ console.error("filterApiCards error:", e); } }
         async function loadPublicBlacklist() { const list = $('#publicBlacklist'), btn = $('#refreshPublicBlacklistBtn'); if (!list) return; list.innerHTML = '<li><i class="fa fa-spinner fa-spin"></i> Loading...</li>'; list.classList.add('empty'); if (btn) btn.disabled = true; try { const res = await fetch('/api/public/blacklist'); const data = await res.json(); if (res.ok && data.blacklist) { list.innerHTML = data.blacklist.length ? data.blacklist.sort().map(ip => `<li>${ip}</li>`).join('') : '<li>Blacklist kosong.</li>'; list.classList.toggle('empty', !data.blacklist.length); } else throw new Error(data.error || 'Failed'); } catch (err) { list.innerHTML = '<li><i class="fa fa-exclamation-triangle"></i> Gagal memuat.</li>'; list.classList.add('empty'); console.error("Error loading public blacklist:", err);} finally { if (btn) btn.disabled = false; } }
-        
-        function updateStatsDisplay(stats) { 
-            try { 
-                $('#totalRequests').textContent = stats.totalRequests ?? 0;
-                $('#serverUptime').textContent = stats.uptime ?? '0s';
-                $('#uniqueUsers').textContent = stats.uniqueUsers ?? 0;
-            } catch(e){ console.error("updateStatsDisplay error:", e); } 
+        function updateStatsDisplay(stats) { try { $('#totalRequests').textContent = stats.totalRequests ?? 0; $('#uniqueVisitors').textContent = stats.uniqueVisitorCount ?? 0; $('#serverUptime').textContent = stats.uptime ?? '0s'; } catch(e){ console.error("updateStatsDisplay error:", e); } }
+        function updateLimitDisplay(myStats) { try { const limitEl = $('#currentLimitStat'); if (!limitEl) return; if (myStats.isLimitEnabled) { if (myStats.remaining === 'Infinity') { limitEl.textContent = 'Unlimited'; } else if (myStats.remaining <= 0) { limitEl.textContent = 'Limit Habis'; limitEl.style.color = 'var(--danger)'; } else { limitEl.textContent = `${myStats.remaining} / ${myStats.limit}`; limitEl.style.color = ''; } } else { limitEl.textContent = 'Unlimited'; limitEl.style.color = ''; } } catch(e) { console.error("updateLimitDisplay error:", e); const limitEl = $('#currentLimitStat'); if (limitEl) limitEl.textContent = 'Error'; } }
+        async function fetchAndUpdateStats() { try { const r = await fetch('/api/stats'); if (r.ok) updateStatsDisplay(await r.json()); } catch (e) {console.warn("Could not fetch stats:", e);} }
+        async function fetchAndUpdateMyLimit() { try { const r = await fetch('/api/my-stats'); if (r.ok) { updateLimitDisplay(await r.json()); } else { const limitEl = $('#currentLimitStat'); if (limitEl) { if (r.status === 429) { limitEl.textContent = 'Limit Habis'; limitEl.style.color = 'var(--danger)'; } else { limitEl.textContent = '...'; } } } } catch (e) { console.warn("Could not fetch my-stats:", e); const limitEl = $('#currentLimitStat'); if (limitEl) limitEl.textContent = '...'; } }
+
+        // [MODIFIKASI] Update Clock: Sekarang update panel FAB
+        function updateClock() {
+            try {
+                const clockPanelContent = $('#fullDateTime');
+                if (!clockPanelContent) {
+                    if(clockInterval) clearInterval(clockInterval);
+                    return;
+                }
+                const now = new Date();
+                const options = {
+                    timeZone: 'Asia/Jakarta',
+                    weekday: 'long', // Senin
+                    day: 'numeric', // 26
+                    month: 'long', // Oktober
+                    year: 'numeric', // 2025
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false
+                };
+                const dateTimeString = now.toLocaleDateString('id-ID', options) + ', ' + now.toLocaleTimeString('id-ID', options).replace(/\./g, ':') + ' WIB';
+                clockPanelContent.textContent = dateTimeString;
+            } catch (e) {
+                console.error("Error updating clock panel:", e);
+                const clockPanelContent = $('#fullDateTime');
+                if(clockPanelContent) clockPanelContent.textContent = "Error loading time";
+                if(clockInterval) clearInterval(clockInterval);
+            }
         }
 
-        function updateLimitDisplay(myStats) { /* ... (fungsi tetap sama) ... */ }
-        async function fetchAndUpdateStats() { try { const r = await fetch('/api/stats'); if (r.ok) updateStatsDisplay(await r.json()); } catch (e) {console.warn("Could not fetch stats:", e);} }
-        async function fetchAndUpdateMyLimit() { /* ... (fungsi tetap sama) ... */ }
+        // --- Notifikasi Functions ---
+        function showToastNotification(message, icon = 'info-circle') { const toast = $('#toast-notification'); const toastIcon = $('#toast-icon'); const toastMsg = $('#toast-message'); if (!toast || !toastIcon || !toastMsg) return; clearTimeout(toastTimeout); toastIcon.className = `fas fa-${icon} toast-icon`; toastMsg.textContent = message; toast.classList.add('show'); toastTimeout = setTimeout(() => { toast.classList.remove('show'); }, 5000); }
+        function timeAgo(timestamp) { const now = Date.now(); const secondsPast = (now - timestamp) / 1000; if (secondsPast < 60) { return parseInt(secondsPast) + 'd lalu'; } if (secondsPast < 3600) { return parseInt(secondsPast / 60) + 'm lalu'; } if (secondsPast <= 86400) { return parseInt(secondsPast / 3600) + 'j lalu'; } const date = new Date(timestamp); return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }); }
+        function renderNotifications(notifications) { const listElement = $('#notification-list'); const emptyElement = $('#notification-panel-empty'); if (!listElement || !emptyElement) return; notifications.sort((a, b) => b.timestamp - a.timestamp); if (notifications.length === 0) { listElement.innerHTML = ''; emptyElement.style.display = 'block'; } else { emptyElement.style.display = 'none'; listElement.innerHTML = notifications.map(notif => ` <li class="notification-item ${!notif.read ? 'unread' : ''}" data-id="${notif.id}"> <span class="notification-icon"><i class="fas fa-${notif.icon || 'info-circle'}"></i></span> <div class="notification-content"> <p>${notif.message}</p> <span class="notification-time">${timeAgo(notif.timestamp)}</span> </div> </li> `).join(''); } }
+        function updateNotificationBadge() { const badge = $('#notification-badge'); const bellButton = $('#notification-bell-btn'); if (!badge || !bellButton) return; unreadNotificationCount = allNotifications.filter(n => !n.read).length; if (unreadNotificationCount > 0) { badge.textContent = unreadNotificationCount > 9 ? '9+' : unreadNotificationCount; badge.style.display = 'flex'; badge.classList.add('show'); bellButton.classList.add('ringing'); } else { badge.style.display = 'none'; badge.classList.remove('show'); bellButton.classList.remove('ringing'); } }
+        async function fetchNotifications() { try { const response = await fetch(`/api/notifications?since=${lastNotificationTimestamp}`); if (!response.ok) { console.warn(`Failed to fetch notifications: ${response.status}`); return; } const data = await response.json(); if (data.notifications && data.notifications.length > 0) { const newNotifications = data.notifications; console.log(`Received ${newNotifications.length} new notifications.`); allNotifications.unshift(...newNotifications); if (allNotifications.length > 50) { allNotifications = allNotifications.slice(0, 50); } if (newNotifications.length > 0) { const latestNew = newNotifications[0]; showToastNotification(latestNew.message, latestNew.icon); } lastNotificationTimestamp = data.serverTime || Date.now(); renderNotifications(allNotifications); updateNotificationBadge(); } } catch (error) { console.error("Error fetching notifications:", error); } }
+        function startNotificationPolling() { if (notificationPollInterval) clearInterval(notificationPollInterval); fetchNotifications(); notificationPollInterval = setInterval(fetchNotifications, 20000); console.log("Notification polling started."); }
 
-        let notifications = []; let unreadCount = 0; const MAX_NOTIFICATIONS = 50;
-
-        function formatTimestamp(timestamp) { const now = new Date(); const date = new Date(timestamp); const diffSeconds = Math.round((now - date) / 1000); const diffMinutes = Math.round(diffSeconds / 60); const diffHours = Math.round(diffMinutes / 60); const diffDays = Math.round(diffHours / 24); if (diffSeconds < 60) return `${diffSeconds} detik lalu`; if (diffMinutes < 60) return `${diffMinutes} menit lalu`; if (diffHours < 24) return `${diffHours} jam lalu`; if (diffDays < 7) return `${diffDays} hari lalu`; return date.toLocaleDateString('id-ID', { day: '2-digit', month: 'short' }); }
-        function renderNotificationList() { const listEl = $('#notificationList'); if (!listEl) return; if (notifications.length === 0) { listEl.innerHTML = '<li class="no-notifications">Belum ada notifikasi.</li>'; return; } listEl.innerHTML = notifications.map(notif => `<li class="${!notif.read ? 'unread' : ''}"> ${notif.message} <span class="timestamp">${formatTimestamp(notif.timestamp)}</span> </li>`).join(''); }
-        function updateNotificationBadge() { const badgeEl = $('#notificationBadge'); const bellEl = $('#notificationBell'); if (!badgeEl || !bellEl) return; if (unreadCount > 0) { badgeEl.textContent = unreadCount > 9 ? '9+' : unreadCount; badgeEl.classList.add('active'); bellEl.classList.add('ringing'); setTimeout(() => bellEl.classList.remove('ringing'), 500); } else { badgeEl.classList.remove('active'); bellEl.classList.remove('ringing'); } }
-        function addNotification(data) { let message = ''; let icon = 'fa-info-circle'; switch (data.type) { case 'newUser': message = `Pengguna baru (${data.ip}) terdeteksi.`; icon = 'fa-user-plus'; break; case 'adminUpdate': message = data.message || 'Update dari admin.'; icon = 'fa-wrench'; if (message.includes('🔑')) icon = 'fa-key'; if (message.includes('🗑️')) icon = 'fa-trash'; if (message.includes('🚫')) icon = 'fa-ban'; if (message.includes('✅')) icon = 'fa-check-circle'; if (message.includes('⚙️') || message.includes('🔧')) icon = 'fa-cog'; if (message.includes('🏷️')) icon = 'fa-tag'; break; default: message = data.message || 'Notifikasi baru.'; } const newNotification = { id: Date.now() + Math.random(), message: message, timestamp: data.timestamp || Date.now(), read: false, type: data.type }; notifications.unshift(newNotification); if (notifications.length > MAX_NOTIFICATIONS) { notifications.pop(); } unreadCount++; showRealtimeNotification(message, icon); updateNotificationBadge(); renderNotificationList(); try { localStorage.setItem('apiNotifications', JSON.stringify(notifications)); localStorage.setItem('apiUnreadCount', unreadCount); } catch (e) { console.warn("Gagal menyimpan notifikasi ke localStorage:", e); } }
-        function markNotificationsAsRead() { notifications.forEach(n => n.read = true); unreadCount = 0; updateNotificationBadge(); renderNotificationList(); try { localStorage.setItem('apiNotifications', JSON.stringify(notifications)); localStorage.setItem('apiUnreadCount', 0); } catch (e) { console.warn("Gagal menyimpan notifikasi ke localStorage:", e); } }
-        function loadNotificationsFromStorage() { try { const storedNotifications = localStorage.getItem('apiNotifications'); const storedUnreadCount = localStorage.getItem('apiUnreadCount'); if (storedNotifications) { notifications = JSON.parse(storedNotifications); unreadCount = notifications.filter(n => !n.read).length; if (storedUnreadCount !== null) { unreadCount = parseInt(storedUnreadCount, 10) || 0; } } else { notifications = []; unreadCount = 0; } renderNotificationList(); updateNotificationBadge(); } catch (e) { console.error("Gagal memuat notifikasi dari localStorage:", e); notifications = []; unreadCount = 0; } }
-
+        // --- Main Initialization Flow ---
         document.addEventListener("DOMContentLoaded", () => {
             console.log("DOM Loaded. Starting initialization flow...");
-            const preloader = $('#preloader'); const body = document.body; const donationModal = $("#donationModal"), continueBtn = $("#continueBtn"), dontShowAgainCheckbox = $('#dontShowAgainCheckbox');
+            const preloader = $('#preloader'); const body = document.body; const donationModal = $("#donationModal"); const continueBtn = $("#continueBtn"); const dontShowAgainCheckbox = $('#dontShowAgainCheckbox');
             if (!preloader || !body) { console.error("Initialization failed: Critical UI elements not found!"); document.body.innerHTML = '<p style="color:red; padding:20px;">Page Initialization Error. Check Console (F12).</p>'; return; }
             const donationSkipped = localStorage.getItem('hideDonationModal');
 
-            function startLoadingAnimation(callback) { /* ... (fungsi tetap sama) ... */ }
+            function startLoadingAnimation(callback) {
+                console.log("Starting loading animation...");
+                const progressBar = $('#loadingProgressBar'); const statusText = $('#loadingStatusText'); const enterBtn = $('#enterButton');
+                if (!preloader || !progressBar || !statusText || !enterBtn) { console.error("Preloader elements not found!"); if(preloader) preloader.classList.add('hidden'); if (callback && typeof callback === 'function') { setTimeout(callback, 0); } else { setTimeout(initializePageContent, 0); } return; }
+                enterBtn.style.display = 'none';
+                const steps = [{ p: 20, t: "Connecting..." }, { p: 40, t: "Authenticating..." }, { p: 70, t: "Loading resources..." }, { p: 90, t: "Preparing UI..." }, { p: 100, t: "Ready!" }];
+                let idx = 0; let animationTimeout;
+                function runStep() { try { if (idx < steps.length) { const s = steps[idx]; progressBar.style.width = s.p + '%'; statusText.textContent = s.t; idx++; animationTimeout = setTimeout(runStep, 300 + Math.random() * 250); } else { console.log("Loading animation finished."); statusText.textContent = "Loading Complete!"; progressBar.style.width = '100%'; enterBtn.style.display = 'inline-flex'; enterBtn.addEventListener('click', () => { console.log("Enter button clicked."); preloader.classList.add('hidden'); setTimeout(() => { if (callback && typeof callback === 'function') { callback(); } else { initializePageContent(); } }, 10); }, { once: true }); } } catch (error) { console.error("Error during loading animation step:", error); if (animationTimeout) clearTimeout(animationTimeout); statusText.textContent = "Loading Error!"; preloader.classList.add('hidden'); if (callback && typeof callback === 'function') { setTimeout(callback, 0); } else { setTimeout(initializePageContent, 0); } } } runStep();
+            }
+
             startLoadingAnimation(() => {
                 console.log("Loading finished, checking donation status...");
-                try {
-                    if (!donationSkipped && donationModal) {
-                        console.log("Donation not skipped. Showing donation modal...");
-                        donationModal.classList.add('active');
-                        continueBtn?.addEventListener("click", () => {
-                            if (dontShowAgainCheckbox?.checked) localStorage.setItem("hideDonationModal", "true");
-                            donationModal.classList.remove("active");
-                            console.log("Donation modal closed, initializing page...");
-                            initializePageContent();
-                        }, { once: true });
-                    } else {
-                         console.log("Donation skipped or modal not found. Initializing page...");
-                         initializePageContent();
-                    }
-                } catch (error) { console.error("Error during donation check:", error); initializePageContent(); }
+                try { if (!donationSkipped && donationModal) { console.log("Donation not skipped..."); donationModal.classList.add('active'); continueBtn?.addEventListener("click", () => { if (dontShowAgainCheckbox?.checked) localStorage.setItem("hideDonationModal", "true"); donationModal.classList.remove("active"); console.log("Donation modal closed..."); initializePageContent(); }, { once: true }); } else { console.log("Donation skipped/not found..."); initializePageContent(); } } catch (error) { console.error("Error during donation check:", error); initializePageContent(); }
             });
 
             async function initializePageContent() {
                 try {
                     console.log("Initializing page content...");
                     body.classList.add('loaded');
-                    const themeBtn = $("#theme-toggle-btn"); const applyTheme = t => { body.dataset.theme = t; localStorage.setItem("theme", t); if(themeBtn) themeBtn.innerHTML = t === "dark" ? '<i class="fa-solid fa-sun" style="color:#f59e0b;"></i>' : '<i class="fa-solid fa-moon" style="color:#818cf8;"></i>'; }; themeBtn?.addEventListener("click", () => applyTheme(body.dataset.theme === "dark" ? "light" : "dark")); applyTheme(localStorage.getItem("theme") || (window.matchMedia?.('(prefers-color-scheme: dark)').matches ? "dark" : "light"));
 
-                    const bgMusic=$('#backgroundMusic'), musicFab=$('#musicFabContainer'), fabToggle=$('#fabToggleBtn'); const musicControls=$('#musicControlsExpanded'), playPause=$('#playPauseBtn'), muteBtn=$('#muteBtn'), volume=$('#volumeSlider'); let musicStarted=false; let userInteracted = false;
-                    const tryStartMusic = () => { if (bgMusic && !musicStarted && userInteracted) { bgMusic.volume = parseFloat(localStorage.getItem('musicVolume') || 0.5); if(volume) volume.value = bgMusic.volume; bgMusic.muted = localStorage.getItem('musicMuted') === 'true'; if (muteBtn) muteBtn.innerHTML = bgMusic.muted ? '<i class="fas fa-volume-mute"></i>' : '<i class="fas fa-volume-up"></i>'; bgMusic.play().then(() => { console.log("Music playing"); if(playPause) playPause.innerHTML = '<i class="fas fa-pause"></i>'; if(musicFab) musicFab.classList.add('visible'); musicStarted = true; }).catch(e => { console.warn("Autoplay music failed even after interaction:", e); if(playPause) playPause.innerHTML = '<i class="fas fa-play"></i>'; if(musicFab) musicFab.classList.add('visible'); musicStarted = true; }); } else if (!userInteracted) { console.log("Music waiting for user interaction."); if(musicFab) musicFab.classList.add('visible'); } };
-                    const interactionListener = () => { if (!userInteracted) { console.log("User interaction detected."); userInteracted = true; tryStartMusic(); document.removeEventListener('click', interactionListener); document.removeEventListener('keydown', interactionListener); } };
-                    document.addEventListener('click', interactionListener, { once: true }); document.addEventListener('keydown', interactionListener, { once: true });
-                    fabToggle?.addEventListener('click', ()=>{ const a=musicControls?.classList.toggle('active');if(fabToggle)fabToggle.innerHTML=a?'<i class="fas fa-times"></i>':'<i class="fas fa-music"></i>';});
-                    playPause?.addEventListener('click',()=>{ if (!userInteracted) { userInteracted = true; tryStartMusic(); return; } if (!musicStarted && bgMusic) { tryStartMusic(); } else if (bgMusic && bgMusic.paused) { bgMusic.play(); playPause.innerHTML = '<i class="fas fa-pause"></i>'; } else if (bgMusic) { bgMusic.pause(); playPause.innerHTML = '<i class="fas fa-play"></i>'; }});
-                    muteBtn?.addEventListener('click',()=>{ if (!bgMusic) return; bgMusic.muted=!bgMusic.muted; if(muteBtn)muteBtn.innerHTML=bgMusic.muted?'<i class="fas fa-volume-mute"></i>':'<i class="fas fa-volume-up"></i>'; localStorage.setItem('musicMuted', bgMusic.muted);});
-                    volume?.addEventListener('input',e=>{ if (!bgMusic) return; const newVolume = parseFloat(e.target.value); bgMusic.volume = newVolume; bgMusic.muted = newVolume === 0; if(muteBtn)muteBtn.innerHTML=bgMusic.muted?'<i class="fas fa-volume-mute"></i>':'<i class="fas fa-volume-up"></i>'; localStorage.setItem('musicVolume', newVolume); if (newVolume === 0) localStorage.setItem('musicMuted', true); else if (localStorage.getItem('musicMuted') === 'true') localStorage.setItem('musicMuted', false); });
-                    
-                    const qrImg = $("#donationQR"), qrBox = $("#qrLightbox"), lightImg = $("#lightboxImage"); if(qrImg && qrBox) { qrImg.addEventListener("click", () => { if(lightImg) lightImg.src = qrImg.src; qrBox.classList.add("active"); }); qrBox.addEventListener("click", e => { if (e.target === qrBox) qrBox.classList.remove("active"); }); }
-                    
+                    const themeBtn = $("#theme-toggle-btn"); const applyTheme = t => { try { body.dataset.theme = t; localStorage.setItem("theme", t); if(themeBtn) themeBtn.innerHTML = t === "dark" ? '<i class="fa-solid fa-sun" style="color:#f59e0b;"></i>' : '<i class="fa-solid fa-moon" style="color:#818cf8;"></i>'; } catch (e) { console.error("Error applying theme:", e); } }; themeBtn?.addEventListener("click", () => applyTheme(body.dataset.theme === "dark" ? "light" : "dark")); applyTheme(localStorage.getItem("theme") || (window.matchMedia?.('(prefers-color-scheme: dark)').matches ? "dark" : "light"));
+
+                    // Music Logic
+                    const bgMusic=$('#backgroundMusic'), musicFabContainer=$('#musicFabContainer'), fabToggle=$('#fabToggleBtn'), musicControls=$('#musicControlsExpanded'), playPause=$('#playPauseBtn'), muteBtn=$('#muteBtn'), volumeSlider=$('#volumeSlider'); let musicStarted = false; let musicShouldPlay = false; const updateMusicUI = () => { try { if (!bgMusic || !playPause || !muteBtn || !volumeSlider || !musicFabContainer) return; playPause.innerHTML = bgMusic.paused ? '<i class="fas fa-play"></i>' : '<i class="fas fa-pause"></i>'; muteBtn.innerHTML = bgMusic.muted ? '<i class="fas fa-volume-mute"></i>' : '<i class="fas fa-volume-up"></i>'; volumeSlider.value = bgMusic.muted ? 0 : bgMusic.volume; musicFabContainer.style.opacity = '1'; } catch(e) { console.error("Error updating music UI:", e); } }; const tryStartMusic = async () => { try { if (musicStarted || !bgMusic) return; musicStarted = true; bgMusic.volume = 0.5; try { await bgMusic.play(); console.log("Background music autoplay succeeded."); musicShouldPlay = true; } catch (e) { console.warn("Background music autoplay failed:", e.name, e.message); musicShouldPlay = false; } finally { updateMusicUI(); } } catch(e) { console.error("Error trying to start music:", e); updateMusicUI(); } }; fabToggle?.addEventListener('click', () => { try { const isActive = musicControls?.classList.toggle('active'); fabToggle.innerHTML = isActive ? '<i class="fas fa-times"></i>' : '<i class="fas fa-music"></i>'; } catch(e){ console.error("FAB toggle error:", e); } }); playPause?.addEventListener('click', async () => { try { if (!bgMusic) return; if (bgMusic.paused) { try { await bgMusic.play(); musicShouldPlay = true; } catch (e) { console.error("Error playing music:", e); showNotification("Gagal memulai musik.", "error"); } } else { bgMusic.pause(); musicShouldPlay = false; } updateMusicUI(); } catch(e){ console.error("Play/Pause error:", e); } }); muteBtn?.addEventListener('click', () => { try { if (!bgMusic) return; bgMusic.muted = !bgMusic.muted; updateMusicUI(); } catch(e){ console.error("Mute error:", e); } }); volumeSlider?.addEventListener('input', e => { try { if (!bgMusic) return; const newVolume = parseFloat(e.target.value); bgMusic.volume = newVolume; bgMusic.muted = newVolume === 0; updateMusicUI(); } catch(e){ console.error("Volume slider error:", e); } }); setTimeout(tryStartMusic, 500);
+
+                    const qrImg = $("#donationQR"), qrBox = $("#qrLightbox"), lightImg = $("#lightboxImage"); if(qrImg && qrBox) { qrImg.addEventListener("click", () => { try { if(lightImg) lightImg.src = qrImg.src; qrBox.classList.add("active"); } catch (e) { console.error("QR zoom error:", e); } }); qrBox.addEventListener("click", e => { try { if (e.target === qrBox) qrBox.classList.remove("active"); } catch(e){} }); }
+
                     const tabsContainer = $("#tabs"), apiList = $("#api-list");
-                    try { settings = await fetch("/api/get-endpoints").then(res => res.ok ? res.json() : Promise.reject('Failed to load')); } catch (e) { showNotification("Gagal load config API!", "error"); settings = { endpoints: {} }; }
+                    try { settings = await fetch("/api/get-endpoints").then(res => res.ok ? res.json() : Promise.reject('Failed to load settings')); } catch (e) { showNotification("Gagal load config API!", "error"); settings = { endpoints: {} }; console.error(e); }
                     const apis = settings.endpoints || {};
-                    $("#page").textContent = settings.pagetitle || "API Docs"; $("#apiTitle").innerHTML = `${settings.apititle || "API"} <span class="version-label">v1.1.1</span>`; $("#credits").textContent = `© ${new Date().getFullYear()} ${settings.creator || "Developer"}`; $("#githubLink").href = settings.github || "#"; $("#whatsappLink").href = settings.whatsapp || "#"; $("#youtubeLink").href = settings.youtube || "#"; $("#aboutApiName").textContent = settings.apititle || "API"; $("#aboutApiCreator").textContent = "By " + (settings.creator || "Dev");
+                    try { $("#page").textContent = settings.pagetitle || "API Docs"; $("#apiTitle").innerHTML = `${settings.apititle || "API"} <span class="version-label">v1.1.1</span>`; $("#credits").textContent = `© ${new Date().getFullYear()} ${settings.creator || "Developer"}`; $("#githubLink").href = settings.github || "#"; $("#whatsappLink").href = settings.whatsapp || "#"; $("#youtubeLink").href = settings.youtube || "#"; $("#aboutApiName").textContent = settings.apititle || "API"; $("#aboutApiCreator").textContent = "By " + (settings.creator || "Dev"); } catch (e) { console.error("Error setting page titles/links:", e); }
+                    if (tabsContainer && apiList && Object.keys(apis).length > 0) { try { const allBtn = document.createElement("button"); allBtn.className = "tab active"; allBtn.dataset.tab = "all"; allBtn.innerText = "All"; tabsContainer.appendChild(allBtn); Object.keys(apis).sort().forEach(k => { const btn=document.createElement("button"); btn.className="tab"; btn.dataset.tab=k; btn.innerText=k[0].toUpperCase()+k.slice(1); tabsContainer.appendChild(btn); }); renderAPIs("all"); filterApiCards(); } catch(e){ console.error("Error rendering tabs:", e); if(apiList) apiList.innerHTML = "<p style='text-align:center;color:var(--gray);'>Gagal render tabs.</p>"; } } else if (apiList) { apiList.innerHTML = "<p style='text-align:center;color:var(--gray);'>Gagal memuat endpoint.</p>";}
+                    function renderAPIs(category) { try { if (!apiList) return; apiList.innerHTML = ""; const endpoints = category === 'all' ? Object.values(apis).flat().sort((a,b)=>(a.name||'').localeCompare(b.name||'')) : (apis[category]?.sort((a,b)=>(a.name||'').localeCompare(b.name||'')) || []); if (endpoints.length === 0) { apiList.innerHTML = "<p style='text-align:center;color:var(--gray);'>Tidak ada endpoint.</p>"; return; } endpoints.forEach((api, i) => { if (!api?.path) return; const card = document.createElement("div"); card.className = "api-card fade-in"; card.style.animationDelay = `${i * 0.03}s`; let label = api.dynamicLabel === 'NEW' ? '<span class="new-label">NEW</span>' : (api.dynamicLabel === 'FIX' ? '<span class="new-label fix-label">FIX</span>' : ''); const basePath = api.path.split('?')[0]; const status = endpointStatuses[basePath] || api.status || 'Active'; let sC = status.toLowerCase().includes("error") ? "danger" : (status.toLowerCase().includes("maintenance") || status.toLowerCase().includes("warning") ? "warning" : ""); card.innerHTML = ` <div class="api-info"> <h3>${api.name||'API'} ${label}</h3> <p>${api.desc||''}</p> <span class="status ${sC}" data-path="${basePath}">${status}</span> </div> <div class="api-actions"> <button class="play-button" data-endpoint="${api.path}" data-api="${api.name||'API'}" data-desc="${api.desc||''}" data-requires-key="${api.requiresKey === true}"> <i class="fa-solid fa-play"></i> Try it now </button> </div>`; apiList.appendChild(card); }); filterApiCards(); } catch(e){ console.error("Error rendering APIs:", e); if(apiList) apiList.innerHTML = "<p style='text-align:center;color:var(--danger-text);'>Error rendering API list.</p>"; } }
 
-                    if (tabsContainer && apiList && Object.keys(apis).length > 0) { const allBtn = document.createElement("button"); allBtn.className = "tab active"; allBtn.dataset.tab = "all"; allBtn.innerText = "All"; tabsContainer.appendChild(allBtn); Object.keys(apis).sort().forEach(k => { const btn=document.createElement("button"); btn.className="tab"; btn.dataset.tab=k; btn.innerText=k[0].toUpperCase()+k.slice(1); tabsContainer.appendChild(btn); }); renderAPIs("all"); filterApiCards(); } else if (apiList) { apiList.innerHTML = "<p style='text-align:center;color:var(--gray);'>Gagal memuat endpoint.</p>";}
-                    
-                    function renderAPIs(category) { 
-                        if (!apiList) return; apiList.innerHTML = ""; 
-                        const endpoints = category === 'all' ? Object.values(apis).flat().sort((a,b)=>(a.name||'').localeCompare(b.name||'')) : (apis[category]?.sort((a,b)=>(a.name||'').localeCompare(b.name||'')) || []); 
-                        if (endpoints.length === 0) { apiList.innerHTML = "<p style='text-align:center;color:var(--gray);'>Tidak ada endpoint.</p>"; return; } 
-                        endpoints.forEach((api, i) => { 
-                            if (!api?.path) return; 
-                            const card = document.createElement("div"); card.className = "api-card fade-in"; card.style.animationDelay = `${i * 0.03}s`; 
-                            let label = api.dynamicLabel === 'NEW' ? '<span class="new-label">NEW</span>' : (api.dynamicLabel === 'FIX' ? '<span class="new-label fix-label">FIX</span>' : ''); 
-                            const basePath = api.path.split('?')[0]; const status = endpointStatuses[basePath] || api.status || 'Active'; 
-                            let sC = status.toLowerCase().includes("error") ? "danger" : (status.toLowerCase().includes("maintenance") || status.toLowerCase().includes("warning") ? "warning" : ""); 
-                            card.innerHTML = `<div class="api-info"> <h3>${api.name||'API'} ${label}</h3> <p>${api.desc||''}</p> <span class="status ${sC}" data-path="${basePath}">${status}</span> </div> <div class="api-actions"> <button class="play-button" data-endpoint="${api.path}" data-api="${api.name||'API'}" data-desc="${api.desc||''}"> <i class="fa-solid fa-play"></i> Try it now </button> </div>`;
-                            apiList.appendChild(card); 
-                        }); 
-                        filterApiCards(); 
-                    }
+                    fetchAndUpdateStats(); fetchAndUpdateMyLimit(); loadPublicBlacklist();
+                    setInterval(fetchAndUpdateStats, 30000); setInterval(fetchAndUpdateMyLimit, 30000);
+                    startStatusPolling();
+                    startNotificationPolling();
+                    if (clockInterval) clearInterval(clockInterval); updateClock(); clockInterval = setInterval(updateClock, 1000);
 
-                    fetchAndUpdateStats(); fetchAndUpdateMyLimit(); loadPublicBlacklist(); loadNotificationsFromStorage();
-                    setInterval(fetchAndUpdateStats, 30000); setInterval(fetchAndUpdateMyLimit, 30000); startStatusPolling();
+                    // Event Listeners
+                    $('#refreshPublicBlacklistBtn')?.addEventListener('click', loadPublicBlacklist);
+                    $('#apiSearchInput')?.addEventListener('input', filterApiCards);
+                    tabsContainer?.addEventListener("click", e => { try { if (e.target.classList.contains("tab")) { tabsContainer.querySelector('.active')?.classList.remove('active'); e.target.classList.add('active'); renderAPIs(e.target.dataset.tab); } } catch(err) { console.error("Tab click error:", err); } });
+                    $('#apiPlatformBadge')?.addEventListener('click', () => { try { $('#apiContentSection')?.scrollIntoView({ behavior: 'smooth' }); } catch(err){} });
 
-                    $('#refreshPublicBlacklistBtn')?.addEventListener('click', loadPublicBlacklist); $('#apiSearchInput')?.addEventListener('input', filterApiCards); tabsContainer?.addEventListener("click", e => { if (e.target.classList.contains("tab")) { tabsContainer.querySelector('.active')?.classList.remove('active'); e.target.classList.add('active'); renderAPIs(e.target.dataset.tab); } }); $('#apiPlatformBadge')?.addEventListener('click', () => $('#apiContentSection')?.scrollIntoView({ behavior: 'smooth' }));
-                    const bellEl = $('#notificationBell'); const listEl = $('#notificationList'); bellEl?.addEventListener('click', (e) => { e.stopPropagation(); const isActive = listEl?.classList.toggle('active'); if (isActive) { markNotificationsAsRead(); } });
-                    document.addEventListener('click', (e) => { if (listEl && !bellEl?.contains(e.target) && !listEl.contains(e.target)) { listEl.classList.remove('active'); } });
+                    const bellBtn = $('#notification-bell-btn'); const notifPanel = $('#notification-panel');
+                    bellBtn?.addEventListener('click', (e) => { try { e.stopPropagation(); const isShown = notifPanel?.classList.toggle('show'); if (isShown) { console.log("Notification panel opened."); allNotifications.forEach(n => n.read = true); renderNotifications(allNotifications); updateNotificationBadge(); bellBtn.classList.remove('ringing'); } else { console.log("Notification panel closed."); } } catch(err){ console.error("Bell click error:", err); } });
 
-                    document.addEventListener("click", e => { try {
-                        const playBtn = e.target.closest(".play-button:not(.btn-secondary):not(#retryRequestBtn):not(#continueBtn)");
-                        if (playBtn) { const { endpoint, api: apiName, desc } = playBtn.dataset; currentEndpointPath = endpoint; const modal = $("#apiResponseModal"), form = $("#paramForm"); modal.querySelector("h5").innerText = apiName || 'API'; modal.querySelector(".modal-header span").innerText = desc || ''; ['retryRequestBtn', 'apiResponseContent', 'copyResponseBtn'].forEach(id => $(`#${id}`)?.classList.add('d-none')); form.innerHTML = ""; if (endpoint?.includes("?")) endpoint.split("?")[1].split("&").forEach(p => { const [k, v] = p.split("="); if(k) form.innerHTML += `<label for="${k}">${k[0].toUpperCase()+k.slice(1)}</label><input type="text" id="${k}" name="${k}" value="${decodeURIComponent(v||"")}" placeholder="Enter ${k}..." required />`; }); $("#submitParamBtn").style.display = 'block'; form.style.display = 'block'; $("#copyEndpointText").innerText = window.location.origin + endpoint.split("?")[0]; modal.querySelector(".copy-section")?.classList.add("active"); modal.classList.add("active"); }
-                        if (e.target.closest(".copy-button:not(#copyResponseBtn)")) copyToClipboard($("#copyEndpointText")?.innerText || '', e.target.closest(".copy-button"), "URL Copied!", true);
-                        if (e.target.closest("#retryRequestBtn")) { e.target.closest("#retryRequestBtn").classList.add('d-none'); $("#apiResponseContent").classList.add("d-none"); $("#copyResponseBtn").classList.add("d-none"); $("#paramForm").style.display = "block"; $("#submitParamBtn").style.display = "block"; }
-                    } catch(err){ console.error("Click listener error:", err); } });
-                    $("#submitParamBtn")?.addEventListener("click", () => { try { const form = $("#paramForm"); if(!form || (form.innerHTML.trim() !== "" && !form.checkValidity())) return form?.reportValidity(); form.style.display = "none"; $("#submitParamBtn").style.display = "none"; $('#retryRequestBtn').classList.add('d-none'); $("#apiResponseLoading").style.display = "block"; let url = currentEndpointPath; if (form.innerHTML.trim() !== "") url = `${currentEndpointPath.split("?")[0]}?${Array.from(form.querySelectorAll("input")).map(i=>`${i.name}=${encodeURIComponent(i.value)}`).join("&")}`; fetchAPI(url); } catch(err){ console.error("Submit error:", err); showNotification("Error submitting request", "error"); $("#apiResponseLoading").style.display = "none"; $("#paramForm").style.display = "block"; $("#submitParamBtn").style.display = "block";} });
-                    function fetchAPI(url) { try{ const fullURL = url.startsWith('/') ? window.location.origin + url : url; const respEl = $("#apiResponseContent"), loadEl = $("#apiResponseLoading"), copyBtn = $("#copyResponseBtn"), retryBtn = $('#retryRequestBtn'); if(!respEl || !loadEl || !copyBtn || !retryBtn) { console.error("Missing elements for fetchAPI"); return; } loadEl.style.display = "block"; [respEl, copyBtn, retryBtn].forEach(el => el.classList.add('d-none')); respEl.style.color = 'var(--light)'; fetch(fullURL).then(async res => { let hasContent = false; respEl.innerHTML = ''; if (res.status === 429) { respEl.textContent = `Error ${res.status}: Terlalu banyak request.`; respEl.style.color = 'var(--danger-text)'; } else if (res.status === 403) { respEl.textContent = `Error ${res.status}: Akses ditolak.`; respEl.style.color = 'var(--danger-text)'; } else if (!res.ok) { let eBody = `HTTP error ${res.status}`; try { eBody = (await res.text()).substring(0,500); } catch {} throw new Error(eBody); } else { const cType = res.headers.get("content-type"); if (cType?.includes("json")) { try { respEl.innerHTML = highlightJSON(await res.json()); hasContent = true; } catch(e){ respEl.textContent = "Error parsing JSON."; respEl.style.color = 'var(--danger-text)';} } else if (cType?.startsWith("image/")) { const imgUrl = URL.createObjectURL(await res.blob()); respEl.innerHTML = `<img src="${imgUrl}" alt="Response" style="max-width:100%;max-height:300px;border-radius:4px;display:block;margin:auto;" />`; hasContent = true; } else { const text = await res.text(); respEl.textContent = text.substring(0, 2000) + (text.length > 2000 ? '\n...' : ''); hasContent = !!text.trim(); } } loadEl.style.display = "none"; respEl.classList.remove("d-none"); if(hasContent || respEl.textContent) { copyBtn.classList.remove("d-none"); retryBtn.classList.remove('d-none'); } fetchAndUpdateMyLimit(); }).catch(err => { loadEl.style.display = "none"; respEl.classList.remove("d-none"); respEl.style.color = 'var(--danger-text)'; respEl.textContent = "Fetch Error:\n" + (err.message || "Gagal"); copyBtn.classList.remove("d-none"); retryBtn.classList.remove('d-none'); showNotification("Request Failed!", 'error'); console.error("fetchAPI fetch error:", err); }); } catch(err){ console.error("fetchAPI outer error:", err); showNotification("Error fetching API", "error"); if($("#apiResponseLoading")) $("#apiResponseLoading").style.display = "none"; }}
+                    // [MODIFIKASI] Clock FAB Listener
+                    const clockFabBtn = $('#clockFabToggleBtn'); const clockPanel = $('#clockDetailsExpanded');
+                    clockFabBtn?.addEventListener('click', (e) => {
+                        try {
+                            e.stopPropagation(); // Prevent closing immediately
+                            const isActive = clockPanel?.classList.toggle('active');
+                            clockFabBtn.innerHTML = isActive ? '<i class="fas fa-times"></i>' : '<i class="fas fa-clock"></i>'; // Toggle icon
+                            updateClock(); // Update time when opened
+                        } catch(err) { console.error("Clock FAB click error:", err); }
+                    });
 
-                    $("#btn-close")?.addEventListener("click", () => $("#apiResponseModal")?.classList.remove("active"));
+                    // [MODIFIKASI] Click Outside Listener (Handles Notif & Clock Panels)
+                    document.addEventListener('click', (e) => {
+                        try {
+                            // Close notification panel
+                            if (notifPanel && notifPanel.classList.contains('show') && !notifPanel.contains(e.target) && !bellBtn?.contains(e.target)) {
+                                notifPanel.classList.remove('show');
+                            }
+                            // Close clock panel
+                            if (clockPanel && clockPanel.classList.contains('active') && !clockPanel.contains(e.target) && !clockFabBtn?.contains(e.target)) {
+                                clockPanel.classList.remove('active');
+                                if (clockFabBtn) clockFabBtn.innerHTML = '<i class="fas fa-clock"></i>'; // Reset icon
+                            }
+                        } catch(err){ console.error("Click outside error:", err); }
+                    });
+
+                    $('#notification-list')?.addEventListener('click', (e) => { try { const item = e.target.closest('.notification-item'); if (item) { const id = parseInt(item.dataset.id, 10); const notif = allNotifications.find(n => n.id === id); if (notif && !notif.read) { notif.read = true; item.classList.remove('unread'); updateNotificationBadge(); console.log(`Notification ${id} marked as read.`); } notifPanel.classList.remove('show'); } } catch(err){ console.error("Notification item click error:", err); } });
+                    document.addEventListener("click", e => { try { const playBtn = e.target.closest(".play-button:not(.btn-secondary):not(#retryRequestBtn):not(#continueBtn)"); if (playBtn) { const { endpoint, api: apiName, desc } = playBtn.dataset; const endpointNeedsKey = playBtn.dataset.requiresKey === 'true'; currentEndpointPath = endpoint; const modal = $("#apiResponseModal"), form = $("#paramForm"); if (!modal || !form) throw new Error("Modal elements not found"); modal.querySelector("h5").innerText = apiName || 'API'; modal.querySelector(".modal-header span").innerText = desc || ''; ['retryRequestBtn', 'apiResponseContent', 'copyResponseBtn'].forEach(id => $(`#${id}`)?.classList.add('d-none')); form.innerHTML = ""; const basePath = endpoint.split("?")[0]; let queryParams = []; if (endpoint.includes("?")) { endpoint.split("?")[1].split("&").forEach(p => { const [k, v] = p.split("="); if (k && k !== 'apikey') { form.innerHTML += `<label for="${k}">${k[0].toUpperCase()+k.slice(1)}</label><input type="text" id="${k}" name="${k}" value="" placeholder="Enter ${k}..." required />`; queryParams.push(k); } }); } if (endpointNeedsKey) { form.innerHTML += `<label for="apikey_modal">API Key (Wajib)</label><input type="text" id="apikey_modal" name="apikey" placeholder="Masukkan API Key Anda..." required />`; queryParams.push('apikey'); } $("#submitParamBtn").style.display = 'block'; form.style.display = 'block'; $("#apiResponseLoading").style.display = 'none'; $("#copyEndpointText").innerText = window.location.origin + basePath; modal.querySelector(".copy-section")?.classList.add("active"); modal.classList.add("active"); form.dataset.basePath = basePath; form.dataset.queryParams = JSON.stringify(queryParams); } if (e.target.closest(".copy-button:not(#copyResponseBtn)")) copyToClipboard($("#copyEndpointText")?.innerText || '', e.target.closest(".copy-button"), "URL Copied!", true); if (e.target.closest("#retryRequestBtn")) { e.target.closest("#retryRequestBtn").classList.add('d-none'); $("#apiResponseContent").classList.add("d-none"); $("#copyResponseBtn").classList.add("d-none"); $("#paramForm").style.display = "block"; $("#submitParamBtn").style.display = "block"; $("#apiResponseLoading").style.display = 'none'; } } catch(err){ console.error("General click listener error:", err); showNotification("Error opening API modal", "error"); } });
+                    $("#submitParamBtn")?.addEventListener("click", () => { try { const form = $("#paramForm"); if(!form) throw new Error("Form not found"); if (!form.checkValidity()) return form?.reportValidity(); form.style.display = "none"; $("#submitParamBtn").style.display = "none"; $('#retryRequestBtn').classList.add('d-none'); $("#apiResponseLoading").style.display = "block"; $("#apiResponseContent").classList.add("d-none"); $("#copyResponseBtn").classList.add("d-none"); const basePath = form.dataset.basePath; const queryParams = JSON.parse(form.dataset.queryParams || '[]'); const urlParams = new URLSearchParams(); queryParams.forEach(paramName => { const input = form.querySelector(`[name="${paramName}"]`); if (input) { urlParams.append(paramName, input.value); } }); let url = basePath; if (urlParams.toString()) { url += "?" + urlParams.toString(); } console.log("Fetching API:", url); fetchAPI(url); } catch(err){ console.error("Submit API request error:", err); showNotification("Error submitting request", "error"); $("#apiResponseLoading").style.display = "none"; $("#paramForm").style.display = "block"; $("#submitParamBtn").style.display = "block";} });
+                    function fetchAPI(url) { try{ const fullURL = url.startsWith('/') ? window.location.origin + url : url; const respEl = $("#apiResponseContent"), loadEl = $("#apiResponseLoading"), copyBtn = $("#copyResponseBtn"), retryBtn = $('#retryRequestBtn'); if(!respEl || !loadEl || !copyBtn || !retryBtn) { console.error("Missing elements for fetchAPI"); return; } loadEl.style.display = "block"; [respEl, copyBtn, retryBtn].forEach(el => el.classList.add('d-none')); respEl.innerHTML = ''; respEl.style.color = 'var(--light)'; fetch(fullURL).then(async res => { let hasContent = false; respEl.innerHTML = ''; if (res.status === 429) { respEl.textContent = `Error ${res.status}: Terlalu banyak request atau limit habis.`; respEl.style.color = 'var(--danger-text)'; } else if (res.status === 403) { let errorMsg = "Akses ditolak (forbidden)."; try { const errData = await res.json(); if(errData.error) errorMsg = errData.error; } catch {} respEl.textContent = `Error ${res.status}: ${errorMsg}`; respEl.style.color = 'var(--danger-text)'; } else if (!res.ok) { let eBody = `HTTP error ${res.status}`; try { eBody = (await res.text()).substring(0,500); } catch {} throw new Error(eBody); } else { const cType = res.headers.get("content-type"); if (cType?.includes("json")) { try { const jsonData = await res.json(); respEl.innerHTML = highlightJSON(jsonData); hasContent = true; } catch(e){ respEl.textContent = "Error parsing JSON response."; respEl.style.color = 'var(--danger-text)'; console.error("JSON Parse Error:", e); } } else if (cType?.startsWith("image/")) { try { const imgUrl = URL.createObjectURL(await res.blob()); respEl.innerHTML = `<img src="${imgUrl}" alt="Response" style="max-width:100%;max-height:300px;border-radius:4px;display:block;margin:auto;" onload="URL.revokeObjectURL(this.src)" />`; hasContent = true; } catch(e){ respEl.textContent = "Error displaying image."; respEl.style.color = 'var(--danger-text)'; console.error("Image Display Error:", e); } } else { try { const text = await res.text(); respEl.textContent = text.substring(0, 2000) + (text.length > 2000 ? '\n...' : ''); hasContent = !!text.trim(); } catch(e){ respEl.textContent = "Error reading text response."; respEl.style.color = 'var(--danger-text)'; console.error("Text Response Error:", e); } } } loadEl.style.display = "none"; respEl.classList.remove("d-none"); if(hasContent || respEl.textContent.trim()) { copyBtn.classList.remove("d-none"); retryBtn.classList.remove('d-none'); } else { retryBtn.classList.remove('d-none'); } fetchAndUpdateMyLimit(); }).catch(err => { loadEl.style.display = "none"; respEl.classList.remove("d-none"); respEl.style.color = 'var(--danger-text)'; respEl.textContent = "Fetch Error:\n" + (err.message || "Gagal menghubungi server."); copyBtn.classList.add("d-none"); retryBtn.classList.remove('d-none'); showNotification("Request Failed!", 'error'); console.error("fetchAPI fetch error:", err); }); } catch(err){ console.error("fetchAPI outer error:", err); showNotification("Error processing API request", "error"); if($("#apiResponseLoading")) $("#apiResponseLoading").style.display = "none"; if ($("#retryRequestBtn")) $("#retryRequestBtn").classList.remove('d-none'); }}
+                    $("#btn-close")?.addEventListener("click", () => { try { $("#apiResponseModal")?.classList.remove("active"); } catch(e){} });
                     $('#copyResponseBtn')?.addEventListener('click', (e) => { try { const rEl = $('#apiResponseContent'); let txt = rEl?.querySelector('img') ? rEl.querySelector('img').src : rEl?.textContent; if(txt) copyToClipboard(txt, e.target.closest('.copy-button'), rEl?.querySelector('img') ? 'URL Gambar Disalin!' : 'Response Disalin!'); } catch(err){console.error("Copy response error:", err);} });
-                    $('#reportErrorBtn')?.addEventListener('click', () => openModal("reportModal", "Lapor Error", "Lapor Error")); $('#requestFeatureBtn')?.addEventListener('click', () => openModal("reportModal", "Request Fitur", "Request Fitur")); $('#aboutApiBtn')?.addEventListener('click', () => openModal("aboutApiModal"));
-                    function openModal(id, title=null, type=null) { try { const m=$(`#${id}`); if(!m) return; if(title){$(`#${id} #reportModalTitle`).textContent=title; $(`#${id} #reportType`).value=type; $(`#${id} #reportForm`)?.reset();} m.classList.add("active"); } catch(e){console.error("openModal error:", e);}}
-                    $$('.modal').forEach(m => m.addEventListener('click', e => { try { if (e.target === m) m.classList.remove('active'); } catch(err){} })); $$('.report-close, .about-close').forEach(b => b.addEventListener('click', e => { try { e.target.closest('.modal')?.classList.remove('active'); } catch(err){} }));
-                    $('#reportForm')?.addEventListener('submit', async e => { e.preventDefault(); const btn=$('#submitReportBtn'); btn.disabled = true; btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Sending...'; const msg = `== ${$('#reportType').value} ==\n👤 ${$('#reportName').value}\n📝 ${$('#reportText').value}`; try { const r = await fetch(`${NGL_PROXY}&text=${encodeURIComponent(msg)}`); if(!r.ok) throw new Error('NGL failed'); showNotification("Laporan terkirim!", 'success'); $('#reportModal').classList.remove('active'); } catch(err) { showNotification("Gagal kirim.", 'error'); console.error("NGL Submit Error:", err);} finally { btn.disabled = false; btn.innerHTML = '<i class="fa fa-paper-plane"></i> Kirim Laporan'; } });
-
-                    function connectWebSocket() {
-                        const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'; const wsUrl = `${wsProtocol}//${window.location.host}`; const socket = new WebSocket(wsUrl);
-                        socket.onopen = () => { console.log('WebSocket Connected'); };
-                        socket.onmessage = (event) => { try { const data = JSON.parse(event.data); console.log('WebSocket Message Received:', data); addNotification(data); } catch (e) { console.error('Failed to parse WebSocket message:', e); } };
-                        socket.onerror = (error) => { console.error('WebSocket Error:', error); showRealtimeNotification("Koneksi notifikasi error.", 'fa-exclamation-triangle'); };
-                        socket.onclose = (event) => { console.warn('WebSocket Disconnected:', event.code, event.reason); showRealtimeNotification("Koneksi notifikasi terputus. Mencoba menghubungkan ulang...", 'fa-plug'); setTimeout(connectWebSocket, 5000); };
-                    }
-                    connectWebSocket();
+                    $('#reportErrorBtn')?.addEventListener('click', () => openModal("reportModal", "Lapor Error", "Lapor Error"));
+                    $('#requestFeatureBtn')?.addEventListener('click', () => openModal("reportModal", "Request Fitur", "Request Fitur"));
+                    $('#aboutApiBtn')?.addEventListener('click', () => openModal("aboutApiModal"));
+                    function openModal(id, title=null, type=null) { try { const m=$(`#${id}`); if(!m) return; if(title && type){ $(`#${id} #reportModalTitle`).textContent=title; $(`#${id} #reportType`).value=type; $(`#${id} #reportForm`)?.reset(); } else if (title) { $(`#${id} h5`).textContent=title; } m.classList.add("active"); } catch(e){console.error("openModal error:", e);}}
+                    $$('.modal').forEach(m => m.addEventListener('click', e => { try { if (e.target === m) m.classList.remove('active'); } catch(err){} }));
+                    $$('.report-close, .about-close, #btn-close').forEach(b => b.addEventListener('click', e => { try { e.target.closest('.modal')?.classList.remove('active'); } catch(err){} }));
+                    $('#reportForm')?.addEventListener('submit', async e => { e.preventDefault(); const btn=$('#submitReportBtn'); btn.disabled = true; btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Sending...'; const msg = `== ${$('#reportType').value} ==\n👤 ${$('#reportName').value}\n📝 ${$('#reportText').value}`; try { const r = await fetch(`${NGL_PROXY}&text=${encodeURIComponent(msg)}`); if(!r.ok) throw new Error(`NGL failed with status ${r.status}`); showNotification("Laporan terkirim!", 'success'); $('#reportModal').classList.remove('active'); } catch(err) { showNotification("Gagal kirim laporan.", 'error'); console.error("NGL Submit Error:", err);} finally { btn.disabled = false; btn.innerHTML = '<i class="fa fa-paper-plane"></i> Kirim'; } });
 
                     console.log("Page content initialized successfully.");
+
                 } catch (pageInitError) {
                     console.error("FATAL ERROR during page content initialization:", pageInitError);
-                    document.body.innerHTML = `<div style="padding: 2rem; text-align: center; color: #991b1c; background: #fee2e2; border: 1px solid #fecaca; border-radius: 8px; margin: 2rem auto; max-width: 500px;"><h2>Initialization Error</h2><p>Failed to initialize the page content. Please check the console (F12) for details and refresh.</p><pre style="text-align:left; font-size: 0.8em; max-height: 200px; overflow: auto; background: #fff; padding: 10px; border-radius: 4px; margin-top: 1rem; white-space: pre-wrap;">${pageInitError.message}\n${pageInitError.stack?.substring(0, 300) || ''}</pre></div>`;
+                    document.body.innerHTML = `<div style="padding: 2rem; text-align: center; color: #991b1c; background: #fee2e2; border: 1px solid #fecaca; border-radius: 8px; margin: 2rem auto; max-width: 500px;"><h2>Initialization Error</h2><p>Failed to initialize the page content. Please try refreshing.</p></div>`;
+                    const preloader = $('#preloader'); if (preloader) preloader.classList.add('hidden');
+                    if(clockInterval) clearInterval(clockInterval); if(notificationPollInterval) clearInterval(notificationPollInterval);
                 }
-            }
-        });
+            } // End initializePageContent
+        }); // End DOMContentLoaded
     </script>
 </body>
 </html>

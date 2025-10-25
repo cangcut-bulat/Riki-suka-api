@@ -10,24 +10,35 @@
             --primary: #6366f1; --primary-dark: #4f46e5; --primary-light: #818cf8;
             --gray-100: #f3f4f6; --gray-200: #e5e7eb; --gray-300: #d1d5db; --gray-500: #6b7280;
             --gray-600: #4b5563; --gray-700: #374151; --gray-800: #1f2937; --gray-900: #111827;
-            --red-100: #fee2e2; --red-700: #b91c1c; --red-border: #fecaca;
+            --red-100: #fee2e2; --red-700: #b91c1c; --red-border: #fecaca; --danger: #ef4444; /* [MODIFIKASI] Added danger */
             --green-100: #dcfce7; --green-700: #047857; --green-border: #a7f3d0;
             --yellow-100: #fef9c3; --yellow-700: #a16207; --yellow-border: #fde68a;
             --white: #ffffff;
             --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
             --ring-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
             --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+            --notif-badge-bg: var(--danger); /* [MODIFIKASI] Notification badge color */
         }
         *, *::before, *::after { box-sizing: border-box; }
         body {
             margin: 0; font-family: var(--font-sans); background-color: var(--gray-100);
             color: var(--gray-800); line-height: 1.5;
             -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+            padding-top: 60px; /* [MODIFIKASI] Added padding-top for fixed header */
         }
 
-        /* --- Notifikasi iPhone Style --- */
+        /* --- [MODIFIKASI] Toast Notification iPhone Style --- */
+        #toast-notification { position: fixed; top: 0; left: 1rem; right: 1rem; margin-top: 1rem; padding: 0.9rem 1.2rem; border-radius: 0.75rem; font-size: 0.9rem; font-weight: 500; color: #fff; background-color: rgba(30, 30, 30, 0.9); box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); transform: translateY(-150%); transition: transform 0.5s cubic-bezier(0.215, 0.610, 0.355, 1); z-index: 1050; display: flex; align-items: center; gap: 0.75rem; border: 1px solid rgba(255, 255, 255, 0.1); max-width: 400px; margin-left: auto; margin-right: auto; backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); }
+        #toast-notification.show { transform: translateY(0); }
+        #toast-notification .toast-icon { font-size: 1.1rem; flex-shrink: 0; }
+        #toast-notification .toast-message { flex-grow: 1; }
+        /* Light theme adaptation (optional, admin usually dark/neutral) */
+        /* body[data-theme="light"] #toast-notification { background-color: rgba(255, 255, 255, 0.9); color: #111; border: 1px solid rgba(0, 0, 0, 0.1); box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); } */
+
+        /* --- Notifikasi Standard (Admin Style) --- */
         .admin-notification {
-            position: fixed; top: 0; left: 20px; right: 20px; margin-top: 15px; padding: 1rem 1.5rem;
+            position: fixed; top: 15px; /* Adjust top position due to fixed header */
+            left: 20px; right: 20px; padding: 1rem 1.5rem;
             border-radius: 0.75rem; font-weight: 600; color: var(--white);
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
             transform: translateY(-200%); transition: transform 0.4s ease-out; z-index: 1000;
@@ -40,19 +51,60 @@
         .admin-notification i { font-size: 1.25rem; }
         /* --- Akhir Notifikasi --- */
 
-        .container { max-width: 1200px; margin: 0 auto; padding: 1.5rem 1rem; padding-top: 70px; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--gray-300); }
-        .header h1 { font-size: 1.875rem; font-weight: 700; color: var(--gray-900); margin: 0; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 1.5rem 1rem; /* padding-top removed */ }
+
+        /* [MODIFIKASI] Fixed Header */
+        .header {
+            position: fixed; /* Make header fixed */
+            top: 0;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1.5rem; /* Adjusted padding */
+            background-color: var(--white); /* Add background */
+            border-bottom: 1px solid var(--gray-300);
+            box-shadow: var(--shadow); /* Add shadow */
+            z-index: 50; /* Ensure it's above content */
+        }
+        .header h1 { font-size: 1.5rem; /* Slightly smaller title */ font-weight: 700; color: var(--gray-900); margin: 0; }
+        .header-actions { display: flex; align-items: center; gap: 0.75rem; position: relative; } /* Container for buttons */
+
         .btn-logout { background-color: var(--red-100); color: var(--red-700); border: 1px solid var(--red-border); padding: 0.5rem 1rem; border-radius: 0.375rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; }
         .btn-logout:hover { background-color: #fecaca; }
 
+        /* [MODIFIKASI] Notification Bell */
+        .notification-bell-button { background: transparent; border: none; color: var(--gray-500); width: 40px; height: 40px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; position: relative; }
+        .notification-bell-button:hover { background-color: var(--gray-100); color: var(--primary); }
+        .notification-badge { position: absolute; top: 5px; right: 5px; background-color: var(--notif-badge-bg); color: white; border-radius: 50%; width: 16px; height: 16px; font-size: 0.65rem; font-weight: 600; display: flex; align-items: center; justify-content: center; line-height: 1; border: 1px solid var(--white); transform: scale(0); transition: transform 0.3s ease; }
+        .notification-badge.show { transform: scale(1); }
+        .notification-bell-button.ringing i { animation: ring 1.5s ease-in-out infinite; }
+        @keyframes ring { 0%, 100% { transform: rotate(0); } 10%, 30%, 50%, 70%, 90% { transform: rotate(-10deg); } 20%, 40%, 60%, 80% { transform: rotate(10deg); } }
+
+        /* [MODIFIKASI] Notification Panel */
+        #notification-panel { position: absolute; top: calc(100% + 10px); right: 0; width: 350px; max-height: 400px; overflow-y: auto; background-color: var(--white); border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); border: 1px solid var(--gray-200); z-index: 60; opacity: 0; transform: translateY(10px); transition: opacity 0.3s ease, transform 0.3s ease; pointer-events: none; }
+        #notification-panel.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+        #notification-list { list-style: none; padding: 0; margin: 0; }
+        .notification-item { padding: 0.8rem 1rem; border-bottom: 1px solid var(--gray-200); display: flex; align-items: flex-start; gap: 0.8rem; cursor: pointer; transition: background-color 0.2s ease; }
+        .notification-item:last-child { border-bottom: none; }
+        .notification-item:hover { background-color: var(--gray-100); }
+        .notification-item.unread { background-color: #eef2ff; /* Light primary background */ }
+        .notification-icon { color: var(--primary); font-size: 1.1rem; margin-top: 2px; flex-shrink: 0; width: 20px; text-align: center; }
+        .notification-content p { margin: 0; font-size: 0.9rem; color: var(--gray-800); line-height: 1.4; }
+        .notification-content .notification-time { font-size: 0.75rem; color: var(--gray-500); margin-top: 3px; display: block; }
+        #notification-panel-empty { text-align: center; padding: 2rem 1rem; color: var(--gray-500); font-size: 0.9rem; }
+        #notification-panel::-webkit-scrollbar { width: 6px; } #notification-panel::-webkit-scrollbar-thumb { background-color: var(--gray-300); border-radius: 3px; }
+
+
         .nav-tabs { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem; background-color: var(--white); border-radius: 0.5rem; padding: 0.5rem; box-shadow: var(--shadow); }
-        .nav-tab { padding: 0.75rem 1.25rem; font-weight: 600; color: var(--gray-600); border-radius: 0.375rem; cursor: pointer; transition: all 0.2s ease; border: 1px solid transparent; display: inline-flex; align-items: center; gap: 0.5rem; }
+        .nav-tab { padding: 0.75rem 1.25rem; font-weight: 600; color: var(--gray-600); border-radius: 0.375rem; cursor: pointer; transition: all 0.2s ease; border: 1px solid transparent; display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; /* [MODIFIKASI] Remove underline */ }
         .nav-tab:hover { background-color: var(--gray-100); color: var(--gray-900); }
         .nav-tab.active { background-color: var(--primary-light); color: var(--primary-dark); border-color: var(--primary-light); box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
         .nav-tab i { color: var(--gray-500); }
         .nav-tab.active i { color: inherit; }
 
+        /* ... (rest of the CSS: .section, .grid, .card, .form-group, .btn, .status-badge, .list-group, table styles, .switch) ... */
         .section { display: none; }
         .section.active { display: block; }
         .grid { display: grid; grid-template-columns: repeat(1, minmax(0, 1fr)); gap: 1.5rem; }
@@ -113,30 +165,59 @@
         .key-cell { font-family: monospace; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .key-cell-container { display: flex; align-items: center; gap: 0.5rem; }
 
-        /* --- Switch Toggle Style --- */
+        /* Switch Toggle Style */
         .switch { position: relative; display: inline-block; width: 50px; height: 28px; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--red-border); transition: .4s; border-radius: 28px; }
         .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
         input:checked + .slider { background-color: var(--primary); }
         input:checked + .slider:before { transform: translateX(22px); }
+
+         /* Responsive adjustments */
+         @media (max-width: 768px) {
+            .header { padding: 0.5rem 1rem; }
+            .header h1 { font-size: 1.25rem; }
+            .nav-tabs { padding: 0.5rem; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+            .nav-tabs::-webkit-scrollbar { display: none; }
+            .nav-tab { padding: 0.6rem 1rem; font-size: 0.9rem; }
+            body { padding-top: 50px; } /* Adjust padding for smaller header */
+            .grid-cols-2, .grid-cols-3 { grid-template-columns: repeat(1, minmax(0, 1fr)); } /* Stack grids on mobile */
+            .grid-span-2, .grid-span-3 { grid-column: span 1 / span 1; }
+            #notification-panel { width: calc(100vw - 2rem); max-width: 320px; }
+         }
+
     </style>
 </head>
 <body>
+    <div id="toast-notification">
+        <i id="toast-icon" class="fas fa-info-circle toast-icon"></i>
+        <span id="toast-message" class="toast-message">Notification message</span>
+    </div>
 
     <div id="adminNotification" class="admin-notification">
         <i id="adminNotificationIcon" class="fa fa-check-circle"></i>
         <span id="adminNotificationText"></span>
     </div>
 
-    <div class="container">
-        <header class="header">
-            <h1>Admin Control Panel</h1>
+    <header class="header">
+        <h1>Admin Control Panel</h1>
+        <div class="header-actions">
+            <button id="notification-bell-btn" class="notification-bell-button" aria-label="Notifications">
+                <i class="fas fa-bell"></i>
+                <span id="notification-badge" class="notification-badge" style="display: none;">0</span>
+            </button>
+            <div id="notification-panel">
+                 <ul id="notification-list">
+                     <li id="notification-panel-empty">Tidak ada notifikasi baru.</li>
+                 </ul>
+             </div>
             <a href="#" id="logoutButton" class="btn-logout">
                 <i class="fa fa-sign-out-alt"></i> Logout
             </a>
-        </header>
+        </div>
+    </header>
 
+    <div class="container">
         <nav class="nav-tabs">
             <a class="nav-tab active" data-section="dashboardSection" onclick="showSection('dashboardSection')"> <i class="fa fa-tachometer-alt"></i> Dashboard </a>
             <a class="nav-tab" data-section="ipUsersSection" onclick="showSection('ipUsersSection')"> <i class="fa fa-users"></i> Pengguna IP </a>
@@ -194,7 +275,6 @@
                     </div>
                  </div>
             </section>
-            
             <section id="endpointSection" class="section">
                 <div class="grid grid-cols-1" style="max-width: 600px; margin: 0 auto;"> <div class="card"> <div class="card-header"><h2>Atur Label Endpoint (NEW/FIX)</h2></div> <div class="card-body"> <form id="endpointLabelForm"> <div class="form-group"> <label for="endpointPath">Endpoint Path</label> <select id="endpointPath" class="form-control" required> <option value="">Loading endpoints...</option> </select> </div> <div class="form-group"> <label for="endpointLabel">Label (NEW / FIX / Kosongkan)</label> <input type="text" id="endpointLabel" class="form-control" placeholder="NEW (case sensitive)"> </div> <button type="submit" class="btn btn-primary" id="endpointLabelButton"> <i class="fa fa-tag"></i> Atur Label (24 jam) </button> </form> </div> </div> </div>
             </section>
@@ -207,67 +287,352 @@
     </div>
 
     <script>
+        // Ambil token dari sessionStorage
         const ADMIN_API_KEY = sessionStorage.getItem('adminApiKey');
         if (!ADMIN_API_KEY) { window.location.href = '/admin'; }
 
-        let notificationTimer;
-        function showAdminNotification(message, type = 'success') { const notif = document.getElementById('adminNotification'); const notifText = document.getElementById('adminNotificationText'); const notifIcon = document.getElementById('adminNotificationIcon'); if (!notif || !notifText || !notifIcon) return; if (notificationTimer) clearTimeout(notificationTimer); notifText.textContent = message; if (type === 'success') { notif.className = 'admin-notification success'; notifIcon.className = 'fa fa-check-circle'; } else { notif.className = 'admin-notification error'; notifIcon.className = 'fa fa-exclamation-triangle'; } notif.classList.add('show'); notificationTimer = setTimeout(() => { notif.classList.remove('show'); }, 3000); }
+        // --- [MODIFIKASI] Variabel Notifikasi ---
+        let lastNotificationTimestamp = 0;
+        let notificationPollInterval;
+        let unreadNotificationCount = 0;
+        let allNotifications = []; // Menyimpan semua notifikasi yang diterima
+        let toastTimeout;
 
-        async function adminFetch(endpoint, options = {}) {
-            const button = options.button || null; if (button) button.disabled = true;
-            try { let reqOptions = { ...options }; if (reqOptions.method && reqOptions.method !== 'GET') { let body = options.body ? JSON.parse(options.body) : {}; body.apikey = ADMIN_API_KEY; reqOptions.body = JSON.stringify(body); reqOptions.headers = { ...options.headers, 'Content-Type': 'application/json' }; } else { const url = new URL(endpoint, window.location.origin); url.searchParams.append('apikey', ADMIN_API_KEY); endpoint = url.pathname + url.search; } const res = await fetch(endpoint, reqOptions); const data = await res.json(); if (!res.ok) { throw new Error(data.error || `Error ${res.status}`); } if (data.message) { showAdminNotification(data.message, 'success'); } return data;
-            } catch (err) { console.error(`Fetch error to ${endpoint}:`, err); showAdminNotification(`Error: ${err.message}`, 'error'); if (err.message.includes("Admin API Key invalid") || err.message.includes("403")) { sessionStorage.removeItem('adminApiKey'); window.location.href = '/admin'; } return null;
-            } finally { if (button) button.disabled = false; }
+        // --- Notifikasi Standard (Admin Style) ---
+        let notificationTimer;
+        function showAdminNotification(message, type = 'success') {
+            const notif = document.getElementById('adminNotification'); const notifText = document.getElementById('adminNotificationText'); const notifIcon = document.getElementById('adminNotificationIcon');
+            if (!notif || !notifText || !notifIcon) return; if (notificationTimer) clearTimeout(notificationTimer);
+            notifText.textContent = message;
+            if (type === 'success') { notif.className = 'admin-notification success'; notifIcon.className = 'fa fa-check-circle'; }
+            else { notif.className = 'admin-notification error'; notifIcon.className = 'fa fa-exclamation-triangle'; }
+            notif.classList.add('show');
+            notificationTimer = setTimeout(() => { notif.classList.remove('show'); }, 3000);
         }
 
-        function copyToClipboard(text, btn) { try { if (!btn) return; const original = btn.innerHTML; const msg = "Berhasil disalin!"; const feedback = (s) => { btn.innerHTML = s ? `<i class="fa fa-check"></i>` : `<i class="fa fa-times"></i> Gagal`; showAdminNotification(s ? msg : "Gagal menyalin!", s ? 'success' : 'error'); setTimeout(() => { if (btn) btn.innerHTML = original; }, 2000); }; if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(text).then(() => feedback(true)).catch(fallback); } else { fallback(); } function fallback() { try { const ta = document.createElement("textarea"); ta.value = text; ta.style.cssText = 'position:fixed;top:-999px;left:-999px;'; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); feedback(true); } catch (e) { console.error('Fallback copy error:', e); feedback(false); } } } catch (e) { console.error("copyToClipboard error:", e); showAdminNotification("Copy error!", "error"); } }
+        // --- [MODIFIKASI] Toast Notification (iPhone Style) ---
+        function showToastNotification(message, icon = 'info-circle') {
+            const toast = document.getElementById('toast-notification');
+            const toastIcon = document.getElementById('toast-icon');
+            const toastMsg = document.getElementById('toast-message');
+            if (!toast || !toastIcon || !toastMsg) return;
+
+            clearTimeout(toastTimeout); // Hapus timeout sebelumnya jika ada
+
+            toastIcon.className = `fas fa-${icon} toast-icon`; // Set ikon
+            toastMsg.textContent = message; // Set pesan
+
+            toast.classList.add('show');
+
+            // Sembunyikan setelah beberapa detik
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 5000); // Tampilkan selama 5 detik
+        }
+
+        // --- [MODIFIKASI] Fungsi Helper Waktu Notifikasi ---
+        function timeAgo(timestamp) {
+            const now = Date.now();
+            const secondsPast = (now - timestamp) / 1000;
+            if (secondsPast < 60) { return parseInt(secondsPast) + 'd lalu'; }
+            if (secondsPast < 3600) { return parseInt(secondsPast / 60) + 'm lalu'; }
+            if (secondsPast <= 86400) { return parseInt(secondsPast / 3600) + 'j lalu'; }
+            const date = new Date(timestamp);
+            return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }); // Include year for older ones
+        }
+
+        // --- [MODIFIKASI] Fungsi Render Notifikasi di Panel ---
+         function renderNotifications(notifications) {
+            const listElement = document.getElementById('notification-list');
+            const emptyElement = document.getElementById('notification-panel-empty');
+            if (!listElement || !emptyElement) return;
+
+            notifications.sort((a, b) => b.timestamp - a.timestamp); // Sort newest first
+
+            if (notifications.length === 0) {
+                listElement.innerHTML = '';
+                emptyElement.style.display = 'block';
+            } else {
+                emptyElement.style.display = 'none';
+                listElement.innerHTML = notifications.map(notif => `
+                    <li class="notification-item ${!notif.read ? 'unread' : ''}" data-id="${notif.id}">
+                        <span class="notification-icon"><i class="fas fa-${notif.icon || 'info-circle'}"></i></span>
+                        <div class="notification-content">
+                            <p>${notif.message}</p>
+                            <span class="notification-time">${timeAgo(notif.timestamp)}</span>
+                        </div>
+                    </li>
+                `).join('');
+            }
+        }
+
+        // --- [MODIFIKASI] Fungsi Update Badge Notifikasi ---
+        function updateNotificationBadge() {
+            const badge = document.getElementById('notification-badge');
+            const bellButton = document.getElementById('notification-bell-btn');
+            if (!badge || !bellButton) return;
+
+            // Hitung ulang dari array allNotifications
+            unreadNotificationCount = allNotifications.filter(n => !n.read).length;
+
+            if (unreadNotificationCount > 0) {
+                badge.textContent = unreadNotificationCount > 9 ? '9+' : unreadNotificationCount;
+                badge.style.display = 'flex'; // Use display flex/none
+                badge.classList.add('show'); // Add show class for animation
+                bellButton.classList.add('ringing'); // Add ringing animation
+            } else {
+                badge.style.display = 'none'; // Hide if count is 0
+                badge.classList.remove('show'); // Remove animation class
+                bellButton.classList.remove('ringing'); // Stop ringing
+            }
+        }
+
+
+        // --- [MODIFIKASI] Fungsi Fetch Notifikasi ---
+        async function fetchNotifications() {
+            try {
+                // Gunakan adminFetch agar token otomatis terkirim
+                const data = await adminFetch(`/api/notifications?since=${lastNotificationTimestamp}`, { method: 'GET' });
+
+                if (data && data.notifications && data.notifications.length > 0) {
+                    const newNotifications = data.notifications.filter(n => n.timestamp > lastNotificationTimestamp); // Filter lagi just in case
+                    console.log(`Received ${newNotifications.length} new notifications.`);
+
+                    // Tambahkan hanya yang benar-benar baru ke awal array
+                    allNotifications.unshift(...newNotifications);
+                     // Batasi jumlah notifikasi di memori (opsional)
+                    if (allNotifications.length > 50) {
+                         allNotifications = allNotifications.slice(0, 50);
+                    }
+
+                    // Tampilkan toast untuk notifikasi paling baru jika ada
+                    if (newNotifications.length > 0) {
+                        const latestNew = newNotifications[0];
+                        showToastNotification(latestNew.message, latestNew.icon);
+                         // Tandai sebagai belum dibaca saat baru diterima
+                        allNotifications.forEach(n => {
+                            if (newNotifications.some(nn => nn.id === n.id)) {
+                                n.read = false; // Pastikan statusnya unread
+                            }
+                        });
+                    }
+
+                    // Update timestamp terakhir
+                    lastNotificationTimestamp = data.serverTime || Date.now();
+
+                    // Render ulang daftar notifikasi di panel
+                    renderNotifications(allNotifications);
+                    // Update badge
+                    updateNotificationBadge();
+                } else if (data && data.serverTime) {
+                    // Update timestamp even if no new notifications
+                     lastNotificationTimestamp = data.serverTime;
+                }
+            } catch (error) {
+                // Error fetch ditangani oleh adminFetch, tidak perlu log error lagi di sini
+                console.warn("Notification poll failed or no new data.");
+                // Jika error karena token invalid, adminFetch akan redirect
+            }
+        }
+
+        // --- [MODIFIKASI] Fungsi Start Polling Notifikasi ---
+        function startNotificationPolling() {
+            if (notificationPollInterval) clearInterval(notificationPollInterval);
+            // Panggil fetch pertama kali, lalu set interval
+            fetchNotifications();
+            notificationPollInterval = setInterval(fetchNotifications, 20000); // Poll every 20 seconds
+            console.log("Admin notification polling started.");
+        }
+
+
+        // --- Fungsi helper untuk fetch (Sudah ada, pastikan apikey ditambahkan dengan benar) ---
+        async function adminFetch(endpoint, options = {}) {
+            const button = options.button || null;
+            if (button) button.disabled = true;
+
+            // Pastikan URL valid
+            let requestUrl;
+             try {
+                 requestUrl = new URL(endpoint, window.location.origin);
+             } catch (e) {
+                  console.error("Invalid endpoint URL:", endpoint);
+                  showAdminNotification(`Error: Invalid endpoint URL`, 'error');
+                  if (button) button.disabled = false;
+                  return null;
+             }
+
+
+            try {
+                let reqOptions = { ...options, headers: { ...options.headers } }; // Clone options and headers
+
+                // Tambahkan apikey
+                if (reqOptions.method && reqOptions.method !== 'GET') {
+                    let body = options.body ? JSON.parse(options.body) : {};
+                    body.apikey = ADMIN_API_KEY; // Tambahkan key ke body
+                    reqOptions.body = JSON.stringify(body);
+                    reqOptions.headers['Content-Type'] = 'application/json'; // Pastikan content type
+                    endpoint = requestUrl.pathname; // Hanya path untuk POST/DELETE dll.
+                } else {
+                    requestUrl.searchParams.append('apikey', ADMIN_API_KEY); // Tambahkan key ke query params
+                    endpoint = requestUrl.pathname + requestUrl.search;
+                }
+
+                // Hapus opsi 'button' agar tidak terkirim di fetch
+                delete reqOptions.button;
+
+                const res = await fetch(endpoint, reqOptions);
+                const data = await res.json();
+
+                if (!res.ok) {
+                    // Cek jika error karena token invalid
+                    if (res.status === 403 && data.error && data.error.includes("Admin API Key invalid")) {
+                         sessionStorage.removeItem('adminApiKey');
+                         window.location.href = '/admin'; // Redirect ke login
+                         throw new Error("Admin API Key invalid. Redirecting..."); // Throw error to stop further execution
+                    }
+                    throw new Error(data.error || `Error ${res.status}`);
+                }
+
+                // Tampilkan notifikasi sukses HANYA jika ada message dari backend
+                if (data.message && options.method !== 'GET') { // Hindari notif sukses untuk GET list
+                    showAdminNotification(data.message, 'success');
+                }
+                return data; // Kembalikan data JSON
+            } catch (err) {
+                console.error(`Fetch error to ${endpoint}:`, err);
+                showAdminNotification(`Error: ${err.message}`, 'error');
+                 // Redirect jika error spesifik token invalid (sudah ditangani di atas)
+                return null; // Return null jika terjadi error lain
+            } finally {
+                if (button) button.disabled = false;
+            }
+        }
+
+
+        // --- Fungsi helper untuk copy (Sudah ada) ---
+        function copyToClipboard(text, btn) {
+            try {
+                if (!btn) return; const original = btn.innerHTML; const msg = "Berhasil disalin!";
+                const feedback = (s) => { btn.innerHTML = s ? `<i class="fa fa-check"></i>` : `<i class="fa fa-times"></i> Gagal`; showAdminNotification(s ? msg : "Gagal menyalin!", s ? 'success' : 'error'); setTimeout(() => { if (btn) btn.innerHTML = original; }, 2000); };
+                if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(text).then(() => feedback(true)).catch(fallback); } else { fallback(); }
+                function fallback() { try { const ta = document.createElement("textarea"); ta.value = text; ta.style.cssText = 'position:fixed;top:-999px;left:-999px;'; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); feedback(true); } catch (e) { console.error('Fallback copy error:', e); feedback(false); } }
+            } catch (e) { console.error("copyToClipboard error:", e); showAdminNotification("Copy error!", "error"); }
+        }
+
+        // Fungsi helper format tanggal (Sudah ada)
         function formatExpiry(timestamp) { if (!timestamp) return '<i>N/A</i>'; const date = new Date(timestamp); return date.toLocaleString('id-ID', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }); }
 
-        function showSection(sectionId) { document.querySelectorAll('.section').forEach(s => s.classList.remove('active')); document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active')); document.getElementById(sectionId).classList.add('active'); document.querySelector(`.nav-tab[data-section="${sectionId}"]`).classList.add('active'); if (sectionId === 'dashboardSection') loadLimitStatus(); if (sectionId === 'ipUsersSection') loadIpLimitList(); if (sectionId === 'blacklistSection') loadBlacklist(); if (sectionId === 'apiKeySettingsSection') loadApiKeyRequirements(); if (sectionId === 'endpointSection') loadEndpointList(); if (sectionId === 'customKeysSection') loadCustomKeys(); }
+        // Fungsi ganti section (Sudah ada)
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            const sectionToShow = document.getElementById(sectionId);
+            const tabToActivate = document.querySelector(`.nav-tab[data-section="${sectionId}"]`);
+
+            if(sectionToShow) sectionToShow.classList.add('active');
+            if(tabToActivate) tabToActivate.classList.add('active');
+
+            // Load data based on section
+            if (sectionId === 'dashboardSection') loadLimitStatus();
+            if (sectionId === 'ipUsersSection') loadIpLimitList();
+            if (sectionId === 'blacklistSection') loadBlacklist();
+            if (sectionId === 'apiKeySettingsSection') loadApiKeyRequirements();
+            if (sectionId === 'endpointSection') loadEndpointList();
+            if (sectionId === 'customKeysSection') loadCustomKeys();
+        }
+
+        // Fungsi logout (Sudah ada)
         document.getElementById('logoutButton').addEventListener('click', (e) => { e.preventDefault(); sessionStorage.removeItem('adminApiKey'); window.location.href = '/admin'; });
 
+        // --- SECTION: DASHBOARD --- (Kode existing, no changes needed)
         async function loadLimitStatus() { const data = await adminFetch('/api/admin/limit/status', { method: 'GET' }); if (data) { const badge = document.getElementById('limitStatusBadge'); const btnText = document.getElementById('limitToggleText'); if (data.enabled) { badge.textContent = 'ON'; badge.className = 'status-badge on'; btnText.textContent = 'Matikan'; } else { badge.textContent = 'OFF'; badge.className = 'status-badge off'; btnText.textContent = 'Aktifkan'; } document.getElementById('globalLimitValue').textContent = data.globalLimit === 0 ? 'Unlimited' : data.globalLimit; document.getElementById('limitToggleButton').dataset.enabled = data.enabled; } }
         document.getElementById('limitToggleForm').addEventListener('submit', async (e) => { e.preventDefault(); const button = document.getElementById('limitToggleButton'); const currentState = button.dataset.enabled === 'true'; await adminFetch('/api/admin/limit/toggle', { method: 'POST', body: JSON.stringify({ enable: !currentState }), button: button }); loadLimitStatus(); });
-        document.getElementById('globalLimitForm').addEventListener('submit', async (e) => { e.preventDefault(); const button = document.getElementById('globalLimitButton'); const newLimit = document.getElementById('newGlobalLimit').value; await adminFetch('/api/admin/limit/set-global', { method: 'POST', body: JSON.stringify({ newLimit: newLimit }), button: button }); loadLimitStatus(); });
+        document.getElementById('globalLimitForm').addEventListener('submit', async (e) => { e.preventDefault(); const button = document.getElementById('globalLimitButton'); const newLimit = document.getElementById('newGlobalLimit').value; await adminFetch('/api/admin/limit/set-global', { method: 'POST', body: JSON.stringify({ newLimit: newLimit }), button: button }); loadLimitStatus(); document.getElementById('newGlobalLimit').value = ''; /* Clear input */ });
         document.getElementById('ipLimitForm').addEventListener('submit', async (e) => { e.preventDefault(); const button = document.getElementById('ipLimitButton'); const ip = document.getElementById('specificIp').value; const newLimit = document.getElementById('newIpLimit').value; await adminFetch('/api/admin/limit/set-ip', { method: 'POST', body: JSON.stringify({ ip: ip, newLimit: newLimit }), button: button }); document.getElementById('ipLimitForm').reset(); });
 
+
+        // --- SECTION: PENGGUNA IP --- (Kode existing, no changes needed)
         function formatMsToTime(ms) { if (ms <= 0) return "Reset"; let s = Math.floor(ms / 1000); let m = Math.floor(s / 60); s = s % 60; let h = Math.floor(m / 60); m = m % 60; return `${h}j ${m}m ${s}d`; }
         async function loadIpLimitList() { const tableBody = document.getElementById('ipLimitTableBody'); tableBody.innerHTML = '<tr><td colspan="4" class="table-placeholder">Loading data...</td></tr>'; const data = await adminFetch('/api/admin/limit/all-ips', { method: 'GET' }); if (data && data.ipData) { if (data.ipData.length === 0) { tableBody.innerHTML = '<tr><td colspan="4" class="table-placeholder">Belum ada data IP.</td></tr>'; } else { tableBody.innerHTML = data.ipData.map(ipInfo => `<tr class="${ipInfo.isExpired ? 'expired-row' : ''}"><td>${ipInfo.ip}</td><td>${ipInfo.usageDisplay}</td><td>${ipInfo.specificLimitDisplay}</td><td>${ipInfo.isExpired ? 'Reset' : formatMsToTime(ipInfo.resetsInMs)}</td></tr>`).join(''); } } else { tableBody.innerHTML = '<tr><td colspan="4" class="table-placeholder">Gagal memuat data.</td></tr>'; } }
         document.getElementById('refreshIpLimitListButton').addEventListener('click', loadIpLimitList);
 
+
+        // --- SECTION: BLACKLIST --- (Kode existing, no changes needed)
         async function loadBlacklist() { const listEl = document.getElementById('blacklistList'); listEl.innerHTML = '<div class="list-group-item placeholder">Loading...</div>'; const data = await adminFetch('/api/admin/blacklist/list', { method: 'GET' }); if (data && data.blacklist) { if (data.blacklist.length === 0) { listEl.innerHTML = '<div class="list-group-item placeholder">Blacklist kosong.</div>'; } else { listEl.innerHTML = data.blacklist.map(ip => `<div class="list-group-item"><code>${ip}</code></div>`).join(''); } } else { listEl.innerHTML = '<div class="list-group-item placeholder">Gagal memuat.</div>'; } }
         document.getElementById('refreshBlacklistButton').addEventListener('click', loadBlacklist);
         document.getElementById('blacklistAddForm').addEventListener('submit', async (e) => { e.preventDefault(); const button = document.getElementById('blacklistAddButton'); const ip = document.getElementById('ipBlacklistAdd').value; await adminFetch('/api/admin/blacklist/add', { method: 'POST', body: JSON.stringify({ ip: ip }), button: button }); document.getElementById('ipBlacklistAdd').value = ''; loadBlacklist(); });
         document.getElementById('blacklistRemoveForm').addEventListener('submit', async (e) => { e.preventDefault(); const button = document.getElementById('blacklistRemoveButton'); const ip = document.getElementById('ipBlacklistRemove').value; await adminFetch('/api/admin/blacklist/remove', { method: 'POST', body: JSON.stringify({ ip: ip }), button: button }); document.getElementById('ipBlacklistRemove').value = ''; loadBlacklist(); });
 
-        async function loadApiKeyRequirements() {
-            const tableBody = document.getElementById('apiKeyReqTableBody'); tableBody.innerHTML = '<tr><td colspan="4" class="table-placeholder"><i class="fa fa-spinner fa-spin"></i> Loading data...</td></tr>';
-            const data = await adminFetch('/api/admin/apikey-requirements/list', { method: 'GET' });
-            if (data && data.requirements) { if (data.requirements.length === 0) { tableBody.innerHTML = '<tr><td colspan="4" class="table-placeholder">Tidak ada endpoint ditemukan.</td></tr>'; } else { tableBody.innerHTML = data.requirements.map(item => { const initialStatus = item.initial ? '<span class="status-badge initial-yes" title="Wajib berdasarkan settings.json">Wajib (Default)</span>' : '<span class="status-badge initial-no" title="Publik berdasarkan settings.json">Publik (Default)</span>'; const currentStatus = item.current ? '<span class="status-badge req-key-yes">Wajib</span>' : '<span class="status-badge req-key-no">Publik</span>'; const isCurrentlyRequired = item.current; const toggleId = `toggle-${item.path.replace(/[^a-zA-Z0-9]/g, '-')}`; return `<tr> <td><code>${item.path}</code></td> <td>${initialStatus}</td> <td>${currentStatus} ${item.current !== item.initial ? '<small style="color: var(--gray-500);">(Diubah)</small>' : ''}</td> <td> <label class="switch" title="${isCurrentlyRequired ? 'Klik untuk menjadikan Publik' : 'Klik untuk mewajibkan API Key'}"> <input type="checkbox" id="${toggleId}" ${isCurrentlyRequired ? 'checked' : ''} onchange="handleToggleApiKeyReq('${item.path}', this.checked, this)"> <span class="slider"></span> </label> </td> </tr>`; }).join(''); } } else { tableBody.innerHTML = '<tr><td colspan="4" class="table-placeholder"><i class="fa fa-exclamation-triangle"></i> Gagal memuat data. Coba refresh.</td></tr>'; }
-        }
-        async function handleToggleApiKeyReq(path, require, checkboxElement) {
-            if (checkboxElement) checkboxElement.disabled = true;
-            const originalState = !require;
-            console.log(`Mengubah ${path} menjadi ${require ? 'WAJIB' : 'PUBLIK'} API Key...`);
-            const data = await adminFetch('/api/admin/apikey-requirements/set', { method: 'POST', body: JSON.stringify({ path: path, require: require }) });
-            if (data) { loadApiKeyRequirements(); showAdminNotification('Perubahan disimpan. Refresh halaman utama (index.html) mungkin diperlukan untuk melihat efeknya di modal "Try it now".', 'success');
-            } else { if (checkboxElement) { checkboxElement.checked = originalState; checkboxElement.disabled = false; } showAdminNotification('Gagal menyimpan perubahan. Status dikembalikan.', 'error'); }
-        }
+
+        // --- SECTION: PENGATURAN API KEY --- (Kode existing, no changes needed)
+        async function loadApiKeyRequirements() { const tableBody = document.getElementById('apiKeyReqTableBody'); tableBody.innerHTML = '<tr><td colspan="4" class="table-placeholder"><i class="fa fa-spinner fa-spin"></i> Loading data...</td></tr>'; const data = await adminFetch('/api/admin/apikey-requirements/list', { method: 'GET' }); if (data && data.requirements) { if (data.requirements.length === 0) { tableBody.innerHTML = '<tr><td colspan="4" class="table-placeholder">Tidak ada endpoint ditemukan.</td></tr>'; } else { tableBody.innerHTML = data.requirements.map(item => { const initialStatus = item.initial ? '<span class="status-badge initial-yes" title="Wajib berdasarkan settings.json">Wajib (Default)</span>' : '<span class="status-badge initial-no" title="Publik berdasarkan settings.json">Publik (Default)</span>'; const currentStatus = item.current ? '<span class="status-badge req-key-yes">Wajib</span>' : '<span class="status-badge req-key-no">Publik</span>'; const isCurrentlyRequired = item.current; const toggleId = `toggle-${item.path.replace(/[^a-zA-Z0-9]/g, '-')}`; return `<tr> <td><code>${item.path}</code></td> <td>${initialStatus}</td> <td>${currentStatus} ${item.current !== item.initial ? '<small style="color: var(--gray-500);">(Diubah)</small>' : ''}</td> <td> <label class="switch" title="${isCurrentlyRequired ? 'Klik untuk menjadikan Publik' : 'Klik untuk mewajibkan API Key'}"> <input type="checkbox" id="${toggleId}" ${isCurrentlyRequired ? 'checked' : ''} onchange="handleToggleApiKeyReq('${item.path}', this.checked, this)"> <span class="slider"></span> </label> </td> </tr>`; }).join(''); } } else { tableBody.innerHTML = '<tr><td colspan="4" class="table-placeholder"><i class="fa fa-exclamation-triangle"></i> Gagal memuat data. Coba refresh.</td></tr>'; } }
+        async function handleToggleApiKeyReq(path, require, checkboxElement) { if (checkboxElement) checkboxElement.disabled = true; const originalState = !require; console.log(`Mengubah ${path} menjadi ${require ? 'WAJIB' : 'PUBLIK'} API Key...`); const data = await adminFetch('/api/admin/apikey-requirements/set', { method: 'POST', body: JSON.stringify({ path: path, require: require }) }); if (data) { loadApiKeyRequirements(); showAdminNotification('Perubahan disimpan.', 'success'); } else { if (checkboxElement) { checkboxElement.checked = originalState; checkboxElement.disabled = false; } showAdminNotification('Gagal menyimpan perubahan. Status dikembalikan.', 'error'); } }
         document.getElementById('refreshApiKeyReqButton').addEventListener('click', loadApiKeyRequirements);
 
+
+        // --- SECTION: ENDPOINT LABEL --- (Kode existing, no changes needed)
         async function loadEndpointList() { const selectEl = document.getElementById('endpointPath'); if (!selectEl) return; if (selectEl.options.length > 1 && selectEl.options[0].value === "") return; selectEl.disabled = true; selectEl.innerHTML = '<option value="">Loading endpoints...</option>'; const data = await adminFetch('/api/admin/endpoints/list', { method: 'GET' }); if (data && data.paths) { selectEl.innerHTML = '<option value="">-- Pilih Endpoint --</option>'; data.paths.forEach(path => { selectEl.innerHTML += `<option value="${path}">${path}</option>`; }); } else { selectEl.innerHTML = '<option value="">Gagal memuat</option>'; } selectEl.disabled = false; }
         document.getElementById('endpointLabelForm').addEventListener('submit', async (e) => { e.preventDefault(); const button = document.getElementById('endpointLabelButton'); const endpoint = document.getElementById('endpointPath').value; const label = document.getElementById('endpointLabel').value; if (!endpoint) { showAdminNotification('Silakan pilih endpoint terlebih dahulu.', 'error'); return; } await adminFetch('/api/admin/set-label', { method: 'POST', body: JSON.stringify({ endpoint: endpoint, label: label }), button: button }); document.getElementById('endpointLabel').value = ''; document.getElementById('endpointPath').selectedIndex = 0; });
 
-        async function loadCustomKeys() {
-            const tableBody = document.getElementById('customKeysTableBody'); tableBody.innerHTML = '<tr><td colspan="6" class="table-placeholder">Loading data...</td></tr>';
-            const data = await adminFetch('/api/admin/customkeys/list', { method: 'GET' });
-            if (data && data.keys) { if (data.keys.length === 0) { tableBody.innerHTML = '<tr><td colspan="6" class="table-placeholder">Belum ada kunci kustom.</td></tr>'; } else { tableBody.innerHTML = data.keys.map(key => { const usage = key.limit === 0 ? `${key.count} / ∞` : `${key.count} / ${key.limit}`; const isInvalid = key.isExpired || key.isOutOfLimit; let statusBadge = ''; if (key.isExpired) statusBadge = '<span class="status-badge key-expired">Expired</span>'; else if (key.isOutOfLimit) statusBadge = '<span class="status-badge key-expired">Limit Habis</span>'; else if (key.limit === 0) statusBadge = '<span class="status-badge key-nolimit">Unlimited</span>'; else statusBadge = '<span class="status-badge key-valid">Aktif</span>'; return `<tr class="${isInvalid ? 'expired-row' : ''}"> <td>${key.name}</td> <td> <div class="key-cell-container"> <span class="key-cell">${key.key}</span> <button class="btn btn-secondary btn-sm" onclick="copyToClipboard('${key.key}', this)" title="Copy Key"><i class="fa fa-copy"></i></button> </div> </td> <td>${usage}</td> <td>${formatExpiry(key.expires)}</td> <td>${statusBadge}</td> <td><button class="btn btn-danger btn-sm" onclick="handleDeleteKey('${key.key}', this)" title="Hapus Key"><i class="fa fa-trash"></i></button></td> </tr>`;}).join(''); } } else { tableBody.innerHTML = '<tr><td colspan="6" class="table-placeholder">Gagal memuat data.</td></tr>'; }
-        }
+
+        // --- SECTION KUNCI KUSTOM --- (Kode existing, no changes needed)
+        async function loadCustomKeys() { const tableBody = document.getElementById('customKeysTableBody'); tableBody.innerHTML = '<tr><td colspan="6" class="table-placeholder">Loading data...</td></tr>'; const data = await adminFetch('/api/admin/customkeys/list', { method: 'GET' }); if (data && data.keys) { if (data.keys.length === 0) { tableBody.innerHTML = '<tr><td colspan="6" class="table-placeholder">Belum ada kunci kustom.</td></tr>'; } else { tableBody.innerHTML = data.keys.map(key => { const usage = key.limit === 0 ? `${key.count} / ∞` : `${key.count} / ${key.limit}`; const isInvalid = key.isExpired || key.isOutOfLimit; let statusBadge = ''; if (key.isExpired) statusBadge = '<span class="status-badge key-expired">Expired</span>'; else if (key.isOutOfLimit) statusBadge = '<span class="status-badge key-expired">Limit Habis</span>'; else if (key.limit === 0) statusBadge = '<span class="status-badge key-nolimit">Unlimited</span>'; else statusBadge = '<span class="status-badge key-valid">Aktif</span>'; return `<tr class="${isInvalid ? 'expired-row' : ''}"> <td>${key.name}</td> <td> <div class="key-cell-container"> <span class="key-cell">${key.key}</span> <button class="btn btn-secondary btn-sm" onclick="copyToClipboard('${key.key}', this)" title="Copy Key"><i class="fa fa-copy"></i></button> </div> </td> <td>${usage}</td> <td>${formatExpiry(key.expires)}</td> <td>${statusBadge}</td> <td><button class="btn btn-danger btn-sm" onclick="handleDeleteKey('${key.key}', this)" title="Hapus Key"><i class="fa fa-trash"></i></button></td> </tr>`;}).join(''); } } else { tableBody.innerHTML = '<tr><td colspan="6" class="table-placeholder">Gagal memuat data.</td></tr>'; } }
         document.getElementById('refreshCustomKeysButton').addEventListener('click', loadCustomKeys);
         document.getElementById('customKeyAddForm').addEventListener('submit', async (e) => { e.preventDefault(); const button = document.getElementById('customKeyAddButton'); const name = document.getElementById('customKeyName').value; const key = document.getElementById('customKeyString').value; const limit = document.getElementById('customKeyLimit').value; const days = document.getElementById('customKeyDays').value; const responseEl = document.getElementById('responseCustomKeyAdd'); if (!key || key.trim() === '') { showAdminNotification('API Key tidak boleh kosong.', 'error'); return; } const data = await adminFetch('/api/admin/customkeys/add', { method: 'POST', body: JSON.stringify({ name: name, key: key.trim(), limit: limit, days: days }), button: button }); if (data && data.newKey) { showAdminNotification(data.message, 'success'); responseEl.style.display = 'block'; responseEl.style.padding = '1rem'; responseEl.style.background = 'var(--gray-100)'; responseEl.style.borderRadius = '0.375rem'; responseEl.innerHTML = `Kunci baru: <code>${data.newKey}</code> <button type="button" class="btn btn-secondary btn-sm" style="margin-left: 10px;" onclick="copyToClipboard('${data.newKey}', this)"><i class="fa fa-copy"></i> Copy</button>`; e.target.reset(); document.getElementById('customKeyName').value = 'Riki shop'; document.getElementById('customKeyString').value = ''; document.getElementById('customKeyLimit').value = '6000'; document.getElementById('customKeyDays').value = '30'; loadCustomKeys(); } else { responseEl.style.display = 'none'; } });
         async function handleDeleteKey(key, buttonEl) { if (!confirm(`Apakah Anda yakin ingin menghapus kunci ini?\n${key}\nAksi ini tidak bisa dibatalkan.`)) return; const data = await adminFetch('/api/admin/customkeys/delete', { method: 'POST', body: JSON.stringify({ key: key }), button: buttonEl }); if (data) loadCustomKeys(); }
 
-        document.addEventListener('DOMContentLoaded', () => { showSection('dashboardSection'); loadLimitStatus(); });
+        // --- Inisialisasi Halaman ---
+        document.addEventListener('DOMContentLoaded', () => {
+            showSection('dashboardSection'); // Section default
+            loadLimitStatus(); // Load data awal dashboard
+
+             // [MODIFIKASI] Event Listener Notifikasi
+            const bellBtn = document.getElementById('notification-bell-btn');
+            const notifPanel = document.getElementById('notification-panel');
+            bellBtn?.addEventListener('click', (e) => {
+                 e.stopPropagation(); // Prevent closing immediately
+                 const isShown = notifPanel?.classList.toggle('show');
+                 if (isShown) {
+                      console.log("Admin notification panel opened.");
+                      // Mark notifications as read when panel is opened
+                      allNotifications.forEach(n => n.read = true);
+                      renderNotifications(allNotifications); // Re-render to remove 'unread' style
+                      updateNotificationBadge(); // Update badge to 0
+                      bellBtn.classList.remove('ringing'); // Stop ringing
+                 } else {
+                      console.log("Admin notification panel closed.");
+                 }
+            });
+            // Close panel when clicking outside
+            document.addEventListener('click', (e) => {
+                 if (notifPanel && !notifPanel.contains(e.target) && !bellBtn?.contains(e.target)) {
+                      notifPanel.classList.remove('show');
+                 }
+            });
+             // Mark specific notification read on click (optional)
+            document.getElementById('notification-list')?.addEventListener('click', (e) => {
+                const item = e.target.closest('.notification-item');
+                if (item) {
+                    const id = parseInt(item.dataset.id, 10);
+                    const notif = allNotifications.find(n => n.id === id);
+                    if (notif && !notif.read) {
+                        notif.read = true;
+                        item.classList.remove('unread');
+                        updateNotificationBadge(); // Update count
+                        console.log(`Admin notification ${id} marked as read.`);
+                        // Optional: Send mark read request to backend here if needed
+                    }
+                     // Add actions based on notification if needed
+                     // Example: if (notif.type === 'newUser') { showSection('ipUsersSection'); }
+                     notifPanel.classList.remove('show'); // Close panel after clicking item
+                }
+            });
+
+             // [MODIFIKASI] Start polling
+             startNotificationPolling();
+
+        });
     </script>
 </body>
 </html>
+
