@@ -146,11 +146,11 @@ Ini adalah langkah terakhir untuk menghubungkan domain (port 80) ke aplikasi Nod
 ```
    server {
     listen 80;
-    server_name domainanda.com; # <-- GANTI INI
+    server_name api.rikishop.my.id; # <-- GANTI INI
 
     location / {
         # Arahkan ke port yang Anda atur di .env
-        proxy_pass http://localhost:8000; 
+        proxy_pass http://localhost:3000; 
 
         # Pengaturan standar untuk meneruskan header
         proxy_set_header Host $host;

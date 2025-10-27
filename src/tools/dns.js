@@ -1,59 +1,115 @@
-const axios = require('axios');
+const axios = require("axios");
 
-module.exports = function(app) {
-    async function scrape(domain, dnsServer) {
-      try {
-        const response = await axios.post(
-          "https://www.nslookup.io/api/v1/records",
-          { domain: domain, dnsServer: dnsServer },
-          {
-            headers: { "accept": "application/json, text/plain, */*", "content-type": "application/json", "User-Agent": "Mozilla/5.0" },
-            timeout: 30000,
-          }
-        );
-        if (response.data && response.data.result) {
-            return response.data.result;
-        } else if (response.data) {
-             return response.data;
-        }
-        throw new Error("Tidak ada data DNS ditemukan");
-      } catch (error) {
-        console.error("API Error (dns scrape):", error.message);
-        throw error.response?.data || error;
-      }
+/**
+ * Scrapes DNS records from nslookup.io API.
+ * @param {string} domain - The domain to lookup.
+ * @param {string} dnsServer - The DNS server to use (e.g., "cloudflare").
+ * @param {object} log - Logger object.
+ * @returns {Promise<object>} - The DNS records result.
+ */
+async function scrape(domain, dnsServer, log) {
+  try {
+    log.info(`[DNS] Scraping DNS for ${domain} using ${dnsServer}`);
+    const response = await axios.post(
+      "https://www.nslookup.io/api/v1/records",
+      {
+        domain: domain,
+        dnsServer: dnsServer,
+      },
+      {
+        headers: {
+          "accept": "application/json, text/plain, */*",
+          "content-type": "application/json",
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+        },
+        timeout: 30000,
+      },
+    );
+    return response.data.result || response.data;
+  } catch (error) {
+    log.error("[DNS] API Error:", error.message);
+    if (axios.isAxiosError(error) && error.response) {
+         log.error("[DNS] External API Response:", error.response.data);
+         throw new Error(`Gagal mendapatkan respons dari API: ${error.response.statusText || error.message}`);
+    }
+    throw new Error("Gagal mendapatkan respons dari API DNS");
+  }
+}
+
+module.exports = function(app, log) {
+  log.info('[DNS] Routes Initialized');
+
+  // --- GET Route ---
+  app.get("/api/tools/dns", async (req, res) => {
+    const { apikey, domain, dnsServer } = req.query;
+
+    if (!global.apikey.includes(apikey)) {
+      log.warn(`[DNS GET] Invalid API Key from IP: ${req.ip}`);
+      return res.status(403).json({ status: false, error: 'Apikey invalid' });
     }
 
-    const handleRequest = async (req, res) => {
-        try {
-            const params = req.method === 'GET' ? req.query : req.body;
-            const { apikey, domain, dnsServer = "cloudflare" } = params;
+    if (!domain) {
+      return res.status(400).json({ status: false, error: "Parameter 'domain' diperlukan" });
+    }
+    if (typeof domain !== "string" || domain.trim().length === 0) {
+      return res.status(400).json({ status: false, error: "Parameter 'domain' harus berupa string yang tidak kosong" });
+    }
+    if (dnsServer && typeof dnsServer !== "string") {
+      return res.status(400).json({ status: false, error: "Parameter 'dnsServer' harus berupa string" });
+    }
 
-            // 1. Validasi API Key
-            if (!global.apikey.includes(apikey)) {
-                return res.json({ status: false, error: 'Apikey invalid' });
-            }
+    try {
+      const result = await scrape(domain.trim(), (dnsServer || "cloudflare").trim(), log);
+      if (!result || (result.records && Object.keys(result.records).length === 0)) {
+        return res.status(404).json({ status: false, error: "Tidak ada data DNS yang ditemukan untuk domain tersebut" });
+      }
+      res.json({
+        status: true,
+        data: result,
+        timestamp: new Date().toISOString(),
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: false,
+        error: error.message || "Terjadi kesalahan internal server",
+      });
+    }
+  });
 
-            // 2. Validasi Parameter 'domain'
-            if (!domain || typeof domain !== "string" || domain.trim().length === 0) {
-                return res.status(400).json({ status: false, error: "Parameter 'domain' wajib diisi" });
-            }
+  // --- POST Route ---
+  app.post("/api/tools/dns", async (req, res) => {
+    const { apikey, domain, dnsServer } = req.body;
 
-            // 3. Panggil helper
-            const result = await scrape(domain.trim(), dnsServer.trim());
+    if (!global.apikey.includes(apikey)) {
+      log.warn(`[DNS POST] Invalid API Key from IP: ${req.ip}`);
+      return res.status(403).json({ status: false, error: 'Apikey invalid' });
+    }
+    
+    if (!domain) {
+      return res.status(400).json({ status: false, error: "Parameter 'domain' diperlukan" });
+    }
+    if (typeof domain !== "string" || domain.trim().length === 0) {
+      return res.status(400).json({ status: false, error: "Parameter 'domain' harus berupa string yang tidak kosong" });
+    }
+    if (dnsServer && typeof dnsServer !== "string") {
+      return res.status(400).json({ status: false, error: "Parameter 'dnsServer' harus berupa string" });
+    }
 
-            // 4. Kirim Respons Sukses
-            res.status(200).json({
-                status: true,
-                result: result
-            });
-
-        } catch (error) {
-            // 5. Tangani Error
-            console.error(`[dns ${req.method}] Error:`, error.message);
-            res.json({ status: false, error: error.message || "Gagal mengambil data DNS" });
-        }
-    };
-
-    app.get('/tools/dns', handleRequest);
-    app.post('/tools/dns', handleRequest);
+    try {
+      const result = await scrape(domain.trim(), (dnsServer || "cloudflare").trim(), log);
+      if (!result || (result.records && Object.keys(result.records).length === 0)) {
+        return res.status(404).json({ status: false, error: "Tidak ada data DNS yang ditemukan untuk domain tersebut" });
+      }
+      res.json({
+        status: true,
+        data: result,
+        timestamp: new Date().toISOString(),
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: false,
+        error: error.message || "Terjadi kesalahan internal server",
+      });
+    }
+  });
 };

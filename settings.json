@@ -453,8 +453,63 @@
         "desc": "Cari anime berdasarkan gambar (via URL)",
         "status": "Active",
         "path": "/tools/identify-anime?imageUrl="
+      },
+      {
+        "name": "QR Code to Text",
+        "desc": "Membaca teks dari gambar QR Code via URL",
+        "status": "Active",
+        "path": "/api/tools/qr2text?apikey=&url="
+      },
+      {
+        "name": "DNS Lookup",
+        "desc": "Mencari data DNS record dari sebuah domain",
+        "status": "Active",
+        "path": "/api/tools/dns?apikey=&domain=&dnsServer="
+      },
+      {
+        "name": "Kodepos Indonesia",
+        "desc": "Mencari kodepos berdasarkan nama lokasi",
+        "status": "Active",
+        "path": "/api/tools/kodepos?apikey=&form="
+      },
+      {
+        "name": "NIK Checker",
+        "desc": "Cek data NIK (Parse + Cek DPT KPU)",
+        "status": "Active",
+        "path": "/api/tools/nik-checker?apikey=&nik="
+      },
+      {
+        "name": "Subdomain Finder",
+        "desc": "Mencari subdomain dari domain (via crt.sh)",
+        "status": "Active",
+        "path": "/api/tools/subdomains?apikey=&domain="
+      },
+      {
+        "name": "Text to Base64",
+        "desc": "Mengubah teks menjadi Base64",
+        "status": "Active",
+        "path": "/api/tools/text2base64?apikey=&text="
+      },
+      {
+        "name": "Dewatermark Image",
+        "desc": "Menghapus watermark dari gambar via URL",
+        "status": "Active",
+        "path": "/api/tools/dewatermark?apikey=&url="
+      },
+      {
+        "name": "HTML to Image",
+        "desc": "Mengubah kode HTML menjadi gambar PNG",
+        "status": "Active",
+        "path": "/api/tools/code2img?apikey=&htmlCode="
+      },
+      {
+        "name": "Text to Binary",
+        "desc": "Mengubah teks menjadi kode biner",
+        "status": "Active",
+        "path": "/api/tools/text2binary?apikey=&content="
       }
-  ],
+    ],
+    
   "stalker": [
     {
       "name": "Instagram Stalk",
@@ -486,31 +541,37 @@
       "name": "Remini",
       "desc": "Remini image",
       "status": "Active",
-      "path": "/imagecreator/remini?url="
+      "path": "/imagecreator/remini?url=https://files.catbox.moe/5jcjbv.png"
     },
     {
       "name": "Removebg",
       "desc": "Remove background image",
       "status": "Active",
-      "path": "/imagecreator/removebg?url="
+      "path": "/imagecreator/removebg?url=https://files.catbox.moe/5jcjbv.png"
     },
     {
       "name": "Upscale",
       "desc": "Upscale image",
       "status": "Active",
-      "path": "/imagecreator/upscale?url="
+      "path": "/imagecreator/upscale?url=https://files.catbox.moe/5jcjbv.png"
     },
     {
       "name": "Colorize",
       "desc": "Colorize image",
       "status": "Active",
-      "path": "/imagecreator/colorize?url="
+      "path": "/imagecreator/colorize?url=https://files.catbox.moe/5jcjbv.png"
     },
     {
       "name": "Brat",
-      "desc": "Brat text generator",
+      "desc": "Brat text generator (Image/GIF)",
       "status": "Active",
-      "path": "/imagecreator/brat?text="
+      "path": "/imagecreator/brat?text=halo Abang ku&isAnimated=&delay="
+    },
+    {
+      "name": "Flux Image",
+      "desc": "Generate image using Flux AI",
+      "status": "Active",
+      "path": "/imagecreator/flux?prompt=&width=&height=&server="
     }
   ],
   

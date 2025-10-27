@@ -54,7 +54,7 @@
       {
         "name": "Cek Status",
         "desc": "Cek status payment (belum implementasi)",
-        "status": "Warning", // Ganti status karena belum implementasi
+        "status": "Warning",
         "path": "/orderkuota/cekstatus?apikey=&merchant=&keyorkut="
       }
   ],
@@ -486,31 +486,37 @@
       "name": "Remini",
       "desc": "Remini image",
       "status": "Active",
-      "path": "/imagecreator/remini?url="
+      "path": "/imagecreator/remini?url=https://files.catbox.moe/5jcjbv.png"
     },
     {
       "name": "Removebg",
       "desc": "Remove background image",
       "status": "Active",
-      "path": "/imagecreator/removebg?url="
+      "path": "/imagecreator/removebg?url=https://files.catbox.moe/5jcjbv.png"
     },
     {
       "name": "Upscale",
       "desc": "Upscale image",
       "status": "Active",
-      "path": "/imagecreator/upscale?url="
+      "path": "/imagecreator/upscale?url=https://files.catbox.moe/5jcjbv.png"
     },
     {
       "name": "Colorize",
       "desc": "Colorize image",
       "status": "Active",
-      "path": "/imagecreator/colorize?url="
+      "path": "/imagecreator/colorize?url=https://files.catbox.moe/5jcjbv.png"
     },
     {
       "name": "Brat",
-      "desc": "Brat text generator",
+      "desc": "Brat text generator (Image/GIF)",
       "status": "Active",
-      "path": "/imagecreator/brat?text="
+      "path": "/imagecreator/brat?text=halo Abang ku&isAnimated=&delay="
+    },
+    {
+      "name": "Flux Image",
+      "desc": "Generate image using Flux AI",
+      "status": "Active",
+      "path": "/imagecreator/flux?prompt=&width=&height=&server="
     }
   ],
   
